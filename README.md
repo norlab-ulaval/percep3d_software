@@ -2,10 +2,24 @@
 Maintainer: luc.coupal.1@ulaval.ca
 
 ## ROS-4-Percept3D for virtual machine
-#### Requirement
-- os Ubuntu 18.04 (Bionic)
+#### Minimum VM requirement
+- 20.04 <= Ubuntu version
+- Tested on Ubuntu 20.04 (Focal)
+- (Mac user) Recommand using [Parallels Desktop](https://www.parallels.com/products/desktop/) (there's a 30 day trial version)
 
-#### Script will install: 
+#### Script usage:
+1. In the VM, execute the following line in a terminal
+   ```shell
+   cd /opt \
+      && sudo apt-get update \
+      && sudo apt-get install --assume-yes git \
+      && sudo git clone https://github.com/norlab-ulaval/dockerized-ROS4percept3D.git \
+      && cd dockerized-ROS4percept3D/ros-percept3D-4-VM \
+      && sudo bash install_percept3d.bash
+   ```
+2. logout current user and login with user `student` pass `percept3d`
+
+#### Script install step: 
 - Install ROS version: melodic
 - Install `libpointmatcher` (latest) + dependencies (boost, eigen, ANN, FLANN, libnabo)
 - Configure the required directory structure for the course
@@ -23,20 +37,9 @@ Maintainer: luc.coupal.1@ulaval.ca
 - Install Paraview
 
 
-#### Script usage:
-1. In the VM, execute the following line in a terminal
-   ```shell
-   cd /opt \
-      && sudo apt-get update \
-      && sudo apt-get install --assume-yes git \
-      && sudo git clone https://github.com/norlab-ulaval/dockerized-ROS4percept3D.git \
-      && cd dockerized-ROS4percept3D/ros-percept3D-4-VM \
-      && sudo bash install_percept3d.bash
-   ```
-2. logout current user and login with user `student` pass `percept3d`
+### Note: 
 
-
-#### To connect remotely to the VM:
+#### To connect remotely to the VM
 1. first in the VM, open a terminal and execute 
    ```shell
    # Find the VM_IP_ADDRESS using 
@@ -52,12 +55,14 @@ Maintainer: luc.coupal.1@ulaval.ca
    ```
 
 
-#### Note on unit-test execution on aarch arm64 (Apple M1 chips): 
+#### Unit-test execution step on aarch arm64 (Apple M1 chips): 
 ```shell
 docker pull --platform linux/arm64 ubuntu:20.04
 docker build --platform linux/arm64 -f Dockerfile -t test-percept3d4vm-ubuntu:20.04 . 
 docker run -a --name iAmTestROSmelodic4vmContainer -t -i test-percept3d4vm-ubuntu:20.04 
 ```
+
+---
 
 ## ROS-4-Percept3D in Docker (In progress)
 Build either 
