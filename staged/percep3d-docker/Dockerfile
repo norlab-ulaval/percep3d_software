@@ -1,5 +1,5 @@
 
-# /// Dockerized-ROS4percept3D course //////////////////////////////////////////////////////////////////////////////////
+# /// percep3d_software course //////////////////////////////////////////////////////////////////////////////////
 
 #ARG BASE_IMAGE=osrf/ros:melodic-desktop-full-bionic
 #ARG BASE_IMAGE=nvcr.io/nvidia/l4t-base:r32.6.1
@@ -18,29 +18,29 @@ ENV DS_ROS_ROOT="/opt/ros/${ROS_DISTRO}"
 
 # ...Add new user.......................................................................................................
 ARG NEW_USER=student
-ENV D4P3D_USER=${NEW_USER}
+ENV P3D_USER=${NEW_USER}
 ARG PASSWORD=percept3d
-ENV D4P3D_USER_HOME="/home/${D4P3D_USER}"
+ENV P3D_USER_HOME="/home/${P3D_USER}"
 
-RUN useradd -d "${D4P3D_USER_HOME}" -m "${D4P3D_USER}" \
-  && yes "${PASSWORD}" | passwd "${D4P3D_USER}"
+RUN useradd -d "${P3D_USER_HOME}" -m "${P3D_USER}" \
+  && yes "${PASSWORD}" | passwd "${P3D_USER}"
 # Add the 'video' groups to new user as it's required for GPU access.
 # (not a problem on norlab-og but mandatory on Jetson device)
 # Ref: https://forums.developer.nvidia.com/t/how-to-properly-create-new-users/68660/2
-RUN usermod -a -G sudo ${D4P3D_USER}
+RUN usermod -a -G sudo ${P3D_USER}
 
 # ...root config........................................................................................................
 # user:newpassword
 RUN echo "root:${PASSWORD}" | chpasswd
 
 # (Optional) Change default shell for new user
-#RUN usermod -s /bin/bash ${D4P3D_USER}
+#RUN usermod -s /bin/bash ${P3D_USER}
 
 # .... Create required dir structure ...................................................................................
 ENV PERCEPT_LIBRARIES="/opt/percep3d_libraries"
-ENV ROS_DEV_WORKSPACE="${D4P3D_USER_HOME}/catkin_ws"
+ENV ROS_DEV_WORKSPACE="${P3D_USER_HOME}/catkin_ws"
 
-RUN mkdir -p "${D4P3D_USER_HOME}/percep3d_data"
+RUN mkdir -p "${P3D_USER_HOME}/percep3d_data"
 WORKDIR "${ROS_DEV_WORKSPACE}"
 
 # ==== Install tools ===================================================================================================
@@ -311,7 +311,7 @@ RUN apt-get update \
 # (Priority) ToDo:validate >> SSH bloc ↓↓
 # ssh port, remaped from default 22 to 2222
 ARG SSH_SERVER_PORT=2222
-ENV D4P3D_SSH_SERVER_PORT=${SSH_SERVER_PORT}
+ENV P3D_SSH_SERVER_PORT=${SSH_SERVER_PORT}
 EXPOSE ${SSH_SERVER_PORT}
 
 # Inspired from https://austinmorlan.com/posts/docker_clion_development/
