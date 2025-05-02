@@ -8,8 +8,8 @@ echo -e "Starting container \033[1;37mssh server on port ${P3D_SSH_SERVER_PORT}\
 # -D : sshd will not detach and does not become a daemon. This allows easy monitoring of sshd.
 # -e : sshd will send the output to the standard error instead of the system log.
 # -f : config_file
-#/usr/sbin/sshd -D -e -f /etc/ssh/sshd_config_ros4percept3d_openssh_server
-/usr/sbin/sshd -e -f /etc/ssh/sshd_config_ros4percept3d_openssh_server
+#/usr/sbin/sshd -D -e -f /etc/ssh/sshd_config_ros4percep3d_openssh_server
+/usr/sbin/sshd -e -f /etc/ssh/sshd_config_ros4percep3d_openssh_server
 
 echo -e "To connect remotely to the container:
     $ ssh -p ${P3D_SSH_SERVER_PORT} ${P3D_USER}@$(hostname -I | awk '{print $1}')

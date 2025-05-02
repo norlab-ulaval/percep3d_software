@@ -19,7 +19,7 @@ ENV DS_ROS_ROOT="/opt/ros/${ROS_DISTRO}"
 # ...Add new user.......................................................................................................
 ARG NEW_USER=student
 ENV P3D_USER=${NEW_USER}
-ARG PASSWORD=percept3d
+ARG PASSWORD=percep3d
 ENV P3D_USER_HOME="/home/${P3D_USER}"
 
 RUN useradd -d "${P3D_USER_HOME}" -m "${P3D_USER}" \
@@ -100,7 +100,7 @@ RUN /bin/bash -c "if [[ ${ROS_DISTRO} == 'melodic' ]]; then \
     fi"
 
 
-FROM general-dev-util AS percept3d-requirement
+FROM general-dev-util AS percep3d-requirement
 # . . Install boost. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 # https://www.boost.org/doc/libs/1_79_0/more/getting_started/unix-variants.html
 RUN apt-get update \
@@ -166,7 +166,7 @@ RUN apt-get update \
         libyaml-cpp-dev \
     && rm -rf /var/lib/apt/lists/*
 
-FROM percept3d-requirement AS percept3d-tools
+FROM percep3d-requirement AS percep3d-tools
 # https://github.com/ethz-asl/libpointmatcher/tree/master
 # (CRITICAL) ToDo:investigate?? >> next bloc ↓↓
 #RUN git clone https://github.com/ethz-asl/libpointmatcher.git \
@@ -197,7 +197,7 @@ RUN git clone https://github.com/norlab-ulaval/norlab_icp_mapper.git \
 # ToDo:on task end >> next bloc ↓↓
 #RUN pwd && tree -L 3
 
-FROM percept3d-tools AS ROS-install
+FROM percep3d-tools AS ROS-install
 # === ROS ==============================================================================================================
 
 # ... register the ROS package source ..................................................................................
@@ -265,7 +265,7 @@ RUN /bin/bash -c "source ${DS_ROS_ROOT}/setup.bash \
 #   > /home/youruser/ros_catkin_ws/src:/opt/ros/melodic/share
 
 
-FROM ROS-install AS percept3d-ROS
+FROM ROS-install AS percep3d-ROS
 ## . . Pull required repository. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 WORKDIR "${ROS_DEV_WORKSPACE}/src/"
 RUN git clone https://github.com/norlab-ulaval/norlab_icp_mapper_ros.git
@@ -296,7 +296,7 @@ RUN apt-get update \
 #    && apt-get install -y rviz
 
 
-FROM percept3d-ROS AS percept3d-ROS-ssh
+FROM percep3d-ROS AS percep3d-ROS-ssh
 # ===Service: ssh server================================================================================================
 
 # install development utilities
@@ -321,7 +321,7 @@ RUN ( \
     echo "PasswordAuthentication yes"; \
     echo "Port ${SSH_SERVER_PORT}"; \
     echo "Subsystem sftp /usr/lib/openssh/sftp-server"; \
-  ) > /etc/ssh/sshd_config_ros4percept3d_openssh_server \
+  ) > /etc/ssh/sshd_config_ros4percep3d_openssh_server \
   && mkdir /run/sshd
 
 # SSH login fix. Otherwise user is kicked off after login
@@ -331,7 +331,7 @@ RUN sed 's@session\s*required\s*pam_loginuid.so@session optional pam_loginuid.so
 ### .... install Paraview ................................................................................................
 # Note | There exist several Docker image for Paraview
 
-##FROM percept3d-ROS AS ROS4percept3DwParaView
+##FROM percep3d-ROS AS ROS4percept3DwParaView
 
 ### https://www.paraview.org
 ##RUN apt-get update \

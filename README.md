@@ -13,13 +13,12 @@ Maintainer: luc.coupal.1@ulaval.ca
     ```shell
     sudo apt-get update && sudo apt-get install --assume-yes git \
       && cd /opt && sudo git clone https://github.com/norlab-ulaval/percep3d_software.git \
-      && cd percep3d_software/percep3d-VM-software \
-      && sudo bash install_percept3d_software.bash
+      && cd percep3d_software/percep3d-VM-software && sudo bash install_percep3d_software.bash
     ```
-3. Logout current user and login with user `student` pass `percept3d`
+3. Logout current user and login with user `student` pass `percep3d`
 
 #### Software installs step:
-The script `install_percept3d_software.bash` will execute the following steps:
+The script `install_percep3d_software.bash.bash` will execute the following steps:
 - Install ROS version: _melodic_ or _noetic_
 - Install `libpointmatcher` (latest) + dependencies (boost, eigen, ANN, FLANN, libnabo)
 - Configure the required directory structure for the course
