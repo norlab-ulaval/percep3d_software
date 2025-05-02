@@ -330,7 +330,7 @@ sudo apt-get update \
 
 
 source "${DS_ROS_ROOT}/setup.bash"
-catkin_make
+catkin_make_isolated
 source "${ROS_DEV_WORKSPACE}/devel/setup.bash"
 
 echo "source ${DS_ROS_ROOT}/setup.bash" >> ~/.bashrc
@@ -358,7 +358,7 @@ cd "${ROS_DEV_WORKSPACE}"
 
 sudo apt-get update
 source "${DS_ROS_ROOT}/setup.bash"
-catkin_make
+catkin_make_isolated
 source "${ROS_DEV_WORKSPACE}/devel/setup.bash"
 
 

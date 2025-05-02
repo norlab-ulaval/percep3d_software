@@ -3,23 +3,24 @@ Maintainer: luc.coupal.1@ulaval.ca
 
 ## Percep3D for Virtual Machine (VM)
 #### VM requirement
-- 20.04 == Ubuntu version
+- Ubuntu 20.04 (Focal) will install ROS version Noetic
+- Ubuntu 18.04 (Bionic) will install ROS version Melodic
 - (Mac user) Recommend using [Parallels Desktop](https://www.parallels.com/products/desktop/) (there's a 30 day trial version)
 
 #### Script usage:
 1. Open the VM
-2. In the VM, execute the following line in a terminal
+2. In the VM, open the _terminal_ app, copy the following lines and execute them in the VM terminal
     ```shell
-    sudo apt-get update && sudo apt-get install --assume-yes git
-    cd /opt && sudo git clone https://github.com/norlab-ulaval/percep3d_software.git
-    cd percep3d_software/percep3d-VM-software
-    sudo bash install_percept3d_software.bash
+    sudo apt-get update && sudo apt-get install --assume-yes git \
+      && cd /opt && sudo git clone https://github.com/norlab-ulaval/percep3d_software.git \
+      && cd percep3d_software/percep3d-VM-software \
+      && sudo bash install_percept3d_software.bash
     ```
 3. Logout current user and login with user `student` pass `percept3d`
 
 #### Software installs step:
 The script `install_percept3d_software.bash` will execute the following steps:
-- Install ROS version: _melodic_
+- Install ROS version: _melodic_ or _noetic_
 - Install `libpointmatcher` (latest) + dependencies (boost, eigen, ANN, FLANN, libnabo)
 - Configure the required directory structure for the course
 - Add user `student` with proper privilege
