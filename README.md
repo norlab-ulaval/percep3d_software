@@ -1,7 +1,7 @@
-# ROS-4-Percept3D course software install 
+# Percep3D course software install 
 Maintainer: luc.coupal.1@ulaval.ca
 
-## ROS-4-Percept3D for virtual machine
+## Percep3D for virtual machine
 #### Minimum VM requirement
 - 20.04 <= Ubuntu version
 - Tested on Ubuntu 20.04 (Focal)
@@ -13,8 +13,8 @@ Maintainer: luc.coupal.1@ulaval.ca
    cd /opt \
       && sudo apt-get update \
       && sudo apt-get install --assume-yes git \
-      && sudo git clone https://github.com/norlab-ulaval/dockerized-ROS4percept3D.git \
-      && cd dockerized-ROS4percept3D/ros-percept3D-4-VM \
+      && sudo git clone https://github.com/norlab-ulaval/percep3d_software.git \
+      && cd percep3d_software/ros-percept3D-4-VM \
       && sudo bash install_percept3d.bash
    ```
 2. logout current user and login with user `student` pass `percept3d`
@@ -64,7 +64,7 @@ docker run -a --name iAmTestROSmelodic4vmContainer -t -i test-percept3d4vm-ubunt
 
 ---
 
-## ROS-4-Percept3D in Docker (In progress)
+## Percep3D in Docker (In progress)
 Build either 
 - Ubuntu 20.04 (Focal) with ROS version Noetic
 - Ubuntu 18.04 (Bionic) with ROS version Melodic
