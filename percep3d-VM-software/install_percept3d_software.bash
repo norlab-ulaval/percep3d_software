@@ -7,16 +7,16 @@
 #       $ cd /opt
 #       $ sudo apt-get update && sudo apt-get install --assume-yes git
 #       $ sudo git clone https://github.com/norlab-ulaval/dockerized-ROS4percept3D.git
-#       $ cd dockerized-ROS4percept3D/ros-percept3D-4-VM
-#       $ sudo bash install_percept3d.bash
+#       $ cd percep3d_software/percep3d-VM-software
+#       $ sudo bash install_percept3d_software.bash
 #   2. logout current user and login with user `student` pass `percept3d`
 #
 #   (!) Be advise that VM root password as also been change to `percept3d`
 
 # Note on unit test:
 #    $ docker pull --platform linux/arm64 ubuntu:20.04
-#    $ docker build --platform linux/arm64 -f Dockerfile -t test-percept3d4vm-ubuntu:20.04 .
-#    $ docker run -a --name iAmTestROSmelodic4vmContainer -t -i test-percept3d4vm-ubuntu:20.04
+#    $ docker build --platform linux/arm64 -f Dockerfile.test -t percep3d-vm-software-tester-ubuntu:20.04 .
+#    $ docker run -a --name iAmTestROSmelodic4vmContainer -t -i percep3d-vm-software-tester-ubuntu:20.04
 
 ROS_PKG='desktop_full'
 ROS_DISTRO='melodic'
@@ -42,7 +42,7 @@ sudo usermod -a -G sudo "${D4P3D_USER}"
 ## (CRITICAL) ToDo:validate >> next bloc ↓↓
 ##    - Related to readme point › 3. ★ Be advise that VM root password has also been change to `percept3d`
 ##    - Configuring root is relevant for the Docker container version, but not sure it is for the shell script version.
-##           Could potentially cause problem if someone execute the script my mistake in the host machine.
+##       Could potentially cause problem if someone execute the script by mistake in the host machine.
 ##    - Note on syntax › user:newpassword
 #sudo echo "root:"${PASSWORD}"" | chpasswd
 

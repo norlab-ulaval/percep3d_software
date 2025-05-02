@@ -1,40 +1,40 @@
 # Percep3D course software install 
 Maintainer: luc.coupal.1@ulaval.ca
 
-## Percep3D for virtual machine
+## Percep3D for Virtual Machine (VM)
 #### Minimum VM requirement
 - 20.04 <= Ubuntu version
 - Tested on Ubuntu 20.04 (Focal)
-- (Mac user) Recommand using [Parallels Desktop](https://www.parallels.com/products/desktop/) (there's a 30 day trial version)
+- (Mac user) Recommend using [Parallels Desktop](https://www.parallels.com/products/desktop/) (there's a 30 day trial version)
 
 #### Script usage:
-1. In the VM, execute the following line in a terminal
-   ```shell
-   cd /opt \
-      && sudo apt-get update \
-      && sudo apt-get install --assume-yes git \
-      && sudo git clone https://github.com/norlab-ulaval/percep3d_software.git \
-      && cd percep3d_software/ros-percept3D-4-VM \
-      && sudo bash install_percept3d.bash
-   ```
-2. logout current user and login with user `student` pass `percept3d`
+1. Open the VM
+2. In the VM, execute the following line in a terminal
+    ```shell
+    sudo apt-get update && sudo apt-get install --assume-yes git
+    cd /opt && sudo git clone https://github.com/norlab-ulaval/percep3d_software.git
+    cd percep3d_software/percep3d-VM-software
+    sudo bash install_percept3d_software.bash
+    ```
+3. Logout current user and login with user `student` pass `percept3d`
 
-#### Script install step: 
-- Install ROS version: melodic
+#### Software installs step:
+The script `install_percept3d_software.bash` will execute the following steps:
+- Install ROS version: _melodic_
 - Install `libpointmatcher` (latest) + dependencies (boost, eigen, ANN, FLANN, libnabo)
 - Configure the required directory structure for the course
 - Add user `student` with proper privilege
 - Fetch the required repository for the _Perception3D_ course and install: 
-  - libpointmatcher_ros
-  - norlab_icp_mapper
-  - norlab_icp_mapper_ros
-  - percep3d_turtle_exercises
+  - `libpointmatcher_ros`
+  - `norlab_icp_mapper`
+  - `norlab_icp_mapper_ros`
+  - `percep3d_turtle_exercises`
 - Fetch ros bag `husky_short_demo.bag`
-- Build a catkin workspace 
+- Build a catkin workspace for ROS
 - Configure an ssh server for remote VM access
-- Workaround for rviz hardware acceleration problem in VM 
-- Workaround for running legacy python2 ROS tutorial in python3 
-- Install Paraview
+- Configure a workaround for *rviz* hardware acceleration problem in VM 
+- Configure a workaround for running legacy _python2_ ROS tutorial in _python3_ 
+- Install *Paraview*
 
 
 ### Note: 
@@ -58,8 +58,8 @@ Maintainer: luc.coupal.1@ulaval.ca
 #### Unit-test execution step on aarch arm64 (Apple M1 chips): 
 ```shell
 docker pull --platform linux/arm64 ubuntu:20.04
-docker build --platform linux/arm64 -f Dockerfile -t test-percept3d4vm-ubuntu:20.04 . 
-docker run -a --name iAmTestROSmelodic4vmContainer -t -i test-percept3d4vm-ubuntu:20.04 
+docker build --platform linux/arm64 -f Dockerfile.test -t percep3d-vm-software-tester-ubuntu:20.04 . 
+docker run -a --name iAmTestROSmelodic4vmContainer -t -i percep3d-vm-software-tester-ubuntu:20.04 
 ```
 
 ---

@@ -34,11 +34,11 @@ COPY percep3d_mapping.zip "."
 #RUN unzip beginner_tutorials.zip
 #RUN unzip percep3d_mapping.zip
 
-COPY install_percept3d.bash "/"
+COPY install_percept3d_software.bash "/"
 
 
 # set read/write permission to entrypoint file
 RUN /bin/bash -c "chmod +x /install_percept3d.bash"
 RUN /bin/bash -c "/install_percept3d.bash"
-#ENTRYPOINT [ "/install_percept3d.bash" ]
+#ENTRYPOINT [ "/install_percept3d_software.bash" ]
 CMD ["bash"]
