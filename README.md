@@ -58,7 +58,7 @@ The script `install_percep3d_software.bash.bash` will execute the following step
 ```shell
 docker pull --platform linux/arm64 ubuntu:20.04
 docker build --platform linux/arm64 -f Dockerfile.test -t percep3d-vm-software-tester-ubuntu:20.04 . 
-docker run -a --name iAmTestROSmelodic4vmContainer -t -i percep3d-vm-software-tester-ubuntu:20.04 
+docker run -a --name IAmTestROSmelodic4vmContainer -t -i percep3d-vm-software-tester-ubuntu:20.04 
 ```
 
 ---

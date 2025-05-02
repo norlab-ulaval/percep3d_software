@@ -4,8 +4,8 @@
 ENV["LC_ALL"] = "en_US.UTF-8"
 
 ## Set which virtual box
-#ubuntu_box = "bento/ubuntu-20.04"
-ubuntu_box = "bento/ubuntu-20.04-arm64"
+#UBUNTU_BOX = "bento/ubuntu-20.04"
+UBUNTU_BOX = "bento/ubuntu-20.04-arm64"
 
 Vagrant.configure("2") do |config|
   # The most common configuration options are documented and commented below.
@@ -26,8 +26,8 @@ Vagrant.configure("2") do |config|
   # ====Shared folder======================
   config.vm.synced_folder ".", "/opt/percep3d_software",
     type: "rsync",
-    # owner: "percep3d",
-    # group: "percep3d",
+#     owner: "percep3d",
+#     group: "percep3d",
     rsync__exclude: [".git", ".vagrant", ".idea", ".DS_Store"],
     automount: true,
     rsync__verbose: false,
@@ -69,8 +69,7 @@ Vagrant.configure("2") do |config|
   #     - port 80 (mapped to host 8080) is for docker internet access, e.g. executin apt-get update inside docker container
 
   config.vm.define "percep3d", primary: true do |tcserver|
-#    tcserver.vm.box = "bento/ubuntu-20.04-arm64"
-    tcserver.vm.box = ubuntu_box
+    tcserver.vm.box = UBUNTU_BOX
     tcserver.vm.network "private_network", ip: "132.203.26.125"
     tcserver.vm.network "forwarded_port", guest: 8111, host: 8111, guest_ip: "132.203.26.125"
     config.vm.network "forwarded_port", guest: 80, host: 8080

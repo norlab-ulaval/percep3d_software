@@ -6,14 +6,10 @@
 #
 # Script usage:
 #   1. In the VM, execute the following line in a terminal
-#       $ cd /opt
 #       $ sudo apt-get update && sudo apt-get install --assume-yes git
-#       $ sudo git clone https://github.com/norlab-ulaval/percep3d_software.git
-#       $ cd percep3d_software/percep3d-VM-software
-#       $ sudo bash install_percep3d_software.bash
+#       $ cd /opt && sudo git clone https://github.com/norlab-ulaval/percep3d_software.git
+#       $ cd percep3d_software/percep3d-VM-software && sudo bash install_percep3d_software.bash
 #   2. logout current user and login with user `student` pass `percep3d`
-#
-#   (!) Be advise that VM root password as also been change to `percep3d`
 #
 # Note on unit test:
 #    $ docker pull --platform linux/arm64 ubuntu:20.04
@@ -39,14 +35,6 @@ sudo usermod -a -G sudo "${P3D_USER}"
 # Note: Add the 'video' groups to new user as it's required for GPU access.
 # (not a problem on norlab-og but mandatory on Jetson device)
 # Ref: https://forums.developer.nvidia.com/t/how-to-properly-create-new-users/68660/2
-
-## ... root config ................................................................................
-## (CRITICAL) ToDo:validate >> next bloc ↓↓
-##  - Related to readme point › 3. ★ Be advise that VM root password has also been change to `percep3d`
-##  - Configuring root is relevant for the Docker container version, but not sure it is for the shell script version.
-##     Could potentially cause problem if someone execute the script by mistake in the host machine.
-##  - Note on syntax › user:newpassword
-#sudo echo "root:"${PASSWORD}"" | chpasswd
 
 
 # .... Create required dir structure ..............................................................
