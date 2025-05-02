@@ -1,0 +1,27 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="(Noetic) percep3d-VM-software/Dockerfile.test" type="docker-deploy" factoryName="dockerfile" server-name="Docker from MacBook">
+    <deployment type="dockerfile">
+      <settings>
+        <option name="imageTag" value="perce3d-software:melodic-full-ubuntu-18.04" />
+        <option name="buildArgs">
+          <list>
+            <DockerEnvVarImpl>
+              <option name="name" value="BASE_IMAGE" />
+              <option name="value" value="ubuntu:20.04" />
+            </DockerEnvVarImpl>
+            <DockerEnvVarImpl>
+              <option name="name" value="ROS_DISTRO" />
+              <option name="value" value="noetic" />
+            </DockerEnvVarImpl>
+          </list>
+        </option>
+        <option name="buildCliOptions" value="--platform linux/arm64" />
+        <option name="containerName" value="IamPercep3D-Noetic" />
+        <option name="commandLineOptions" value="-it" />
+        <option name="showCommandPreview" value="true" />
+        <option name="sourceFilePath" value="../percep3d_software/percep3d-VM-software/Dockerfile.test" />
+      </settings>
+    </deployment>
+    <method v="2" />
+  </configuration>
+</component>

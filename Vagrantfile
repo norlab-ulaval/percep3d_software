@@ -1,0 +1,143 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+ENV["LC_ALL"] = "en_US.UTF-8"
+
+## Set which virtual box
+#ubuntu_box = "bento/ubuntu-20.04"
+ubuntu_box = "bento/ubuntu-20.04-arm64"
+
+Vagrant.configure("2") do |config|
+  # The most common configuration options are documented and commented below.
+  # For a complete reference, please see the online documentation at
+  # https://docs.vagrantup.com.
+
+  # Create a forwarded port mapping which allows access to a specific port
+  # within the machine from a port on the host machine. In the example below,
+  # accessing "localhost:8080" will access port 80 on the guest machine.
+  # NOTE: This will enable public access to the opened port
+  # config.vm.network "forwarded_port", guest: 80, host: 8080
+
+  # Create a forwarded port mapping which allows access to a specific port
+  # within the machine from a port on the host machine and only allow access
+  # via 127.0.0.1 to disable public access
+  # config.vm.network "forwarded_port", guest: 80, host: 8080, host_ip: "127.0.0.1"
+
+  # ====Shared folder======================
+  config.vm.synced_folder ".", "/opt/percep3d_software",
+    type: "rsync",
+    # owner: "percep3d",
+    # group: "percep3d",
+    rsync__exclude: [".git", ".vagrant", ".idea", ".DS_Store"],
+    automount: true,
+    rsync__verbose: false,
+    rsync__auto: true
+
+  # ====vagrant-gatling-rsync==============
+  ##   Ref https://github.com/smerrill/vagrant-gatling-rsync
+  #if Vagrant.has_plugin?("vagrant-gatling-rsync")
+  #  config.gatling.latency = 2.5
+  #  config.gatling.time_format = "%H:%M:%S"
+  #end
+
+  # Automatically start the sync engine on vagrant up or vagrant reload
+  # when the machines that you bring up have one or more rsync folders defined
+  config.gatling.rsync_on_startup = false
+
+  # ====Provider-specific configuration====
+  #  Parallels Tools customization with prlctl command-line utility:
+  #  Ref:
+  #  - https://parallels.github.io/vagrant-parallels/docs/configuration.html
+  #  - https://download.parallels.com/desktop/v16/docs/en_US/Parallels%20Desktop%20Pro%20Edition%20Command-Line%20Reference.pdf
+  #
+  config.vm.provider "parallels" do |prl|
+    # Setup Parallels Tools Auto-Update
+    prl.update_guest_tools = true
+
+    # Customize the amount of memory on the VM:
+    prl.memory = 16048
+    prl.cpus = 4
+
+    # (CRITICAL) ToDo: Switch to false for release
+    prl.linked_clone = true
+  end
+
+  # ====Multimachine config================
+  # Note:
+  # - VM port mapping:
+  #     - port 8111 is for accessing TeamCity GUI from the host browser
+  #     - port 80 (mapped to host 8080) is for docker internet access, e.g. executin apt-get update inside docker container
+
+  config.vm.define "percep3d", primary: true do |tcserver|
+#    tcserver.vm.box = "bento/ubuntu-20.04-arm64"
+    tcserver.vm.box = ubuntu_box
+    tcserver.vm.network "private_network", ip: "132.203.26.125"
+    tcserver.vm.network "forwarded_port", guest: 8111, host: 8111, guest_ip: "132.203.26.125"
+    config.vm.network "forwarded_port", guest: 80, host: 8080
+    tcserver.vm.hostname = "percep3d"
+
+    tcserver.vm.provision "Check network", type: "shell", run: "always", inline: <<-SHELL
+        echo
+        echo "I am '$(whoami)', my address is $(ifconfig eth1 | grep inet | awk '$1==\"inet\" {print $2}')"
+        echo
+    SHELL
+  end
+
+  # ====Provisioning========================
+  config.vm.provision "shell", inline: <<-SHELL
+    export DEBIAN_FRONTEND=noninteractive
+    apt-get update
+    apt-get install --assume-yes \
+        sudo \
+        apt-utils \
+        lsb-release \
+        ca-certificates \
+        software-properties-common \
+        build-essential \
+        bash-completion \
+        fontconfig \
+        vim \
+        tree \
+        git \
+        curl \
+        wget \
+        gnupg2 \
+        zip gzip tar unzip \
+        rsync \
+        net-tools \
+        dnsutils
+
+    # (Priority) ToDo: assessment >> next bloc ↓↓
+    # apt-get install --assume-yes ubuntu-desktop
+    # sudo reboot
+
+  SHELL
+
+  # Execute rsync from the host on 'vagrant up' trigger
+  config.trigger.after :up do |trigger|
+     trigger.only_on = "percep3d"
+     trigger.name = "rsync cmd"
+     trigger.info = "Executing 'vagrant rsync' now"
+     trigger.run = {inline: "bash -c 'vagrant rsync'"}
+     trigger.on_error = :continue
+  end
+
+  # Execute rsync from the host on 'vagrant snapshot' trigger
+  config.trigger.after :snapshot_restore, type: :action do |trigger|
+     trigger.only_on = "percep3d"
+     trigger.name = "rsync cmd on 'vagrant snapshot restore'"
+     trigger.info = "Executing 'vagrant rsync' now"
+     trigger.run = {inline: "bash -c 'vagrant rsync'"}
+     trigger.on_error = :continue
+  end
+
+  config.trigger.after :up do |trigger|
+    trigger.only_on = "percep3d"
+    trigger.name = "Dir sync info"
+    trigger.info = "\033[1;33m Remember to use the command \033[1;2mvagrant rsync\033[0m\033[1;33m to execute a one time sync of the \033[1;2mpercep3d_software\033[0m\033[1;33m directory with all guess VM or use the command \033[1;2mvagrant rsync-auto\033[0m\033[1;33m to start file watching and sync automaticaly on changes. Alternatively, enable \033[1;2mvagrant-gatling-rsync\033[0m\033[1;33m in the Vagrantfile.\033[0m"
+  end
+
+
+end
+
+

@@ -1,0 +1,13 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Ubuntu 20.04" type="docker-deploy" factoryName="docker-image" server-name="Docker from MacBook">
+    <deployment type="docker-image">
+      <settings>
+        <option name="imageTag" value="ubuntu:20.04" />
+        <option name="attachToContainerNeeded" value="true" />
+        <option name="containerName" value="IamUbuntuNoeticArm64" />
+        <option name="showCommandPreview" value="true" />
+      </settings>
+    </deployment>
+    <method v="2" />
+  </configuration>
+</component>
