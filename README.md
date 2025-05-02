@@ -1,11 +1,30 @@
 # Percep3D course software install 
 Maintainer: luc.coupal.1@ulaval.ca
 
+---
+
+<!-- TOC -->
+* [Percep3D course software install](#percep3d-course-software-install-)
+  * [Percep3D for Virtual Machine (VM)](#percep3d-for-virtual-machine-vm)
+      * [VM requirement](#vm-requirement)
+      * [Script usage:](#script-usage)
+      * [Software installs step:](#software-installs-step)
+    * [Note:](#note-)
+      * [To connect remotely to the VM](#to-connect-remotely-to-the-vm)
+  * [Percep3D in Docker (In progress)](#percep3d-in-docker-in-progress)
+* [Instruction for maintainer](README.dev.md#development-resources)
+<!-- TOC -->
+
+---
+
 ## Percep3D for Virtual Machine (VM)
 #### VM requirement
-- Ubuntu 20.04 (Focal) will install ROS version Noetic
-- Ubuntu 18.04 (Bionic) will install ROS version Melodic
-- (Mac user) Recommend using [Parallels Desktop](https://www.parallels.com/products/desktop/) (there's a 30 day trial version)
+One of the following ubuntu distro:
+- Ubuntu 20.04 (Focal) for working with ROS1 version Noetic
+- Ubuntu 18.04 (Bionic) for working with ROS1 version Melodic
+
+#### VM provider
+- (Note for Mac user) Recommend using [Parallels Desktop](https://www.parallels.com/products/desktop/) (there's a 30 day trial version)
 
 #### Script usage:
 1. Open the VM
@@ -50,16 +69,8 @@ The script `install_percep3d_software.bash.bash` will execute the following step
    ssh -p 2222 student@VM_IP_ADDRESS
    
    # or to copy file
-   scp -P 2222 /path/to/foo student@VM_IP_ADDRESS:/dest/
+   scp -P 2222 </path/to/file> student@VM_IP_ADDRESS:<path/to/dest/dir/>
    ```
-
-
-#### Unit-test execution step on aarch arm64 (Apple M1 chips): 
-```shell
-docker pull --platform linux/arm64 ubuntu:20.04
-docker build --platform linux/arm64 -f Dockerfile.test -t percep3d-vm-software-tester-ubuntu:20.04 . 
-docker run -a --name IAmTestROSmelodic4vmContainer -t -i percep3d-vm-software-tester-ubuntu:20.04 
-```
 
 ---
 
