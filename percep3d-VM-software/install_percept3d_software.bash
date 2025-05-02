@@ -21,8 +21,8 @@
 #    $ docker run -a --name iAmTestROSmelodic4vmContainer -t -i percep3d-vm-software-tester-ubuntu:20.04
 #
 ROS_PKG='desktop_full'
-ROS_DISTRO='melodic'
-#ROS_DISTRO='noetic'
+#ROS_DISTRO='melodic'
+ROS_DISTRO='noetic'
 DS_ROS_ROOT="/opt/ros/${ROS_DISTRO}"
 
 

@@ -2,9 +2,8 @@
 Maintainer: luc.coupal.1@ulaval.ca
 
 ## Percep3D for Virtual Machine (VM)
-#### Minimum VM requirement
-- 20.04 <= Ubuntu version
-- Tested on Ubuntu 20.04 (Focal)
+#### VM requirement
+- 20.04 == Ubuntu version
 - (Mac user) Recommend using [Parallels Desktop](https://www.parallels.com/products/desktop/) (there's a 30 day trial version)
 
 #### Script usage:
