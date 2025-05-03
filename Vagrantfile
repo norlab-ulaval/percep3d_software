@@ -6,6 +6,7 @@ ENV["LC_ALL"] = "en_US.UTF-8"
 ## Set which virtual box
 #UBUNTU_BOX = "bento/ubuntu-20.04"
 UBUNTU_BOX = "bento/ubuntu-20.04-arm64"
+SYNC_FOLDER_GUEST = "/opt/percep3d_software"
 
 Vagrant.configure("2") do |config|
   # The most common configuration options are documented and commented below.
@@ -24,10 +25,10 @@ Vagrant.configure("2") do |config|
   # config.vm.network "forwarded_port", guest: 80, host: 8080, host_ip: "127.0.0.1"
 
   # ====Shared folder======================
-  config.vm.synced_folder ".", "/opt/percep3d_software",
+  config.vm.synced_folder ".", SYNC_FOLDER_GUEST,
     type: "rsync",
-#     owner: "percep3d",
-#     group: "percep3d",
+    # owner: "percep3d",
+    # group: "percep3d",
     rsync__exclude: [".git", ".vagrant", ".idea", ".DS_Store"],
     automount: true,
     rsync__verbose: false,
@@ -65,28 +66,30 @@ Vagrant.configure("2") do |config|
   # ====Multimachine config================
   # Note:
   # - VM port mapping:
-  #     - port 8111 is for accessing TeamCity GUI from the host browser
   #     - port 80 (mapped to host 8080) is for docker internet access, e.g. executin apt-get update inside docker container
+  #     - port 2222 is for accessing the VM ssh server for Remote Developement setup
 
-  config.vm.define "percep3d", primary: true do |tcserver|
+  config.vm.define "percep3d-vm", primary: true do |tcserver|
     tcserver.vm.box = UBUNTU_BOX
-    tcserver.vm.network "private_network", ip: "132.203.26.125"
-    tcserver.vm.network "forwarded_port", guest: 8111, host: 8111, guest_ip: "132.203.26.125"
-    config.vm.network "forwarded_port", guest: 80, host: 8080
     tcserver.vm.hostname = "percep3d"
-
-    tcserver.vm.provision "Check network", type: "shell", run: "always", inline: <<-SHELL
-        echo
-        echo "I am '$(whoami)', my address is $(ifconfig eth1 | grep inet | awk '$1==\"inet\" {print $2}')"
-        echo
-    SHELL
+    config.vm.network "forwarded_port", guest: 80, host: 8080
+    # config.vm.network "forwarded_port", guest: 2222, host: 2222
+    #
+    # tcserver.vm.network "private_network", ip: "132.203.26.125"
+    # # tcserver.vm.network "forwarded_port", guest: 8111, host: 8111, guest_ip: "132.203.26.125"
+    # tcserver.vm.provision "Check network", type: "shell", run: "always", inline: <<-SHELL
+    #     echo
+    #     echo "I am '$(whoami)', my address is $(ifconfig eth1 | grep inet | awk '$1==\"inet\" {print $2}')"
+    #     echo
+    # SHELL
   end
 
   # ====Provisioning========================
   config.vm.provision "shell", inline: <<-SHELL
     export DEBIAN_FRONTEND=noninteractive
     apt-get update
-    apt-get install --assume-yes \
+    apt-get install --assume-yes --no-install-recommends \
+        locales \
         sudo \
         apt-utils \
         lsb-release \
@@ -107,14 +110,22 @@ Vagrant.configure("2") do |config|
         dnsutils
 
     # (Priority) ToDo: assessment >> next bloc ↓↓
-    # apt-get install --assume-yes ubuntu-desktop
+    apt-get install --assume-yes --no-install-recommends ubuntu-desktop
+
+    # (Priority) ToDo: assessment >> next bloc ↓↓
+    locale-gen en_US en_US.UTF-8 && update-locale LC_ALL=en_US.UTF-8 LANG=en_US.UTF-8
+
     # sudo reboot
+
+    # (Priority) ToDo: validate >> next bloc ↓↓
+    echo "Set default landing path"
+    echo "cd ${SYNC_FOLDER_GUEST:?err}/percep3d-VM-software" >> ~/.bashrc
 
   SHELL
 
   # Execute rsync from the host on 'vagrant up' trigger
   config.trigger.after :up do |trigger|
-     trigger.only_on = "percep3d"
+     trigger.only_on = "percep3d-vm"
      trigger.name = "rsync cmd"
      trigger.info = "Executing 'vagrant rsync' now"
      trigger.run = {inline: "bash -c 'vagrant rsync'"}
@@ -123,7 +134,7 @@ Vagrant.configure("2") do |config|
 
   # Execute rsync from the host on 'vagrant snapshot' trigger
   config.trigger.after :snapshot_restore, type: :action do |trigger|
-     trigger.only_on = "percep3d"
+     trigger.only_on = "percep3d-vm"
      trigger.name = "rsync cmd on 'vagrant snapshot restore'"
      trigger.info = "Executing 'vagrant rsync' now"
      trigger.run = {inline: "bash -c 'vagrant rsync'"}
@@ -131,7 +142,7 @@ Vagrant.configure("2") do |config|
   end
 
   config.trigger.after :up do |trigger|
-    trigger.only_on = "percep3d"
+    trigger.only_on = "percep3d-vm"
     trigger.name = "Dir sync info"
     trigger.info = "\033[1;33m Remember to use the command \033[1;2mvagrant rsync\033[0m\033[1;33m to execute a one time sync of the \033[1;2mpercep3d_software\033[0m\033[1;33m directory with all guess VM or use the command \033[1;2mvagrant rsync-auto\033[0m\033[1;33m to start file watching and sync automaticaly on changes. Alternatively, enable \033[1;2mvagrant-gatling-rsync\033[0m\033[1;33m in the Vagrantfile.\033[0m"
   end

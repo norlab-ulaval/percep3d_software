@@ -1,6 +1,6 @@
 #!/bin/bash -i
-
-# /// Percept3D course software install ///////////////////////////////////////////////////////////
+# =================================================================================================
+# Percept3D course software install
 #
 # Maintainer: luc.coupal.1@ulaval.ca
 #
@@ -16,15 +16,45 @@
 #    $ docker build --platform linux/arm64 -f Dockerfile.test -t percep3d-vm-software-tester-ubuntu:20.04 .
 #    $ docker run -a --name iAmTestROSmelodic4vmContainer -t -i percep3d-vm-software-tester-ubuntu:20.04
 #
+# =================================================================================================
+set -e # Note: we want the installer to always fail-fast (it wont affect the build system policy)
+
+
+# ....Hardcoded environment variable...............................................................
 ROS_PKG='desktop_full'
-#ROS_DISTRO='melodic'
-ROS_DISTRO='noetic'
-DS_ROS_ROOT="/opt/ros/${ROS_DISTRO}"
+P3D_USER='student'
+PASSWORD='percep3d'
+PERCEPT_LIBRARIES_PATH="/opt/percep3d_libraries"
+
+SETUP_SSH_DAEMON=false
+SETUP_SSH_DAEMON=${SETUP_SSH_DAEMON:-true} # Skip ssh daemon setup if set to false
+
+
+# ....Auto set ROS distro..........................................................................
+echo -e "\nAuto set ROS distro\n"
+
+sudo apt-get update \
+  && sudo apt-get install --assume-yes \
+      lsb-release \
+  && sudo rm -rf /var/lib/apt/lists/*
+
+# Retrieve ubuntu version number: DISTRIB_RELEASE
+source /etc/lsb-release
+if [[ ${DISTRIB_RELEASE} == '18.04' ]]; then
+  ROS_DISTRO='melodic'
+elif [[ ${DISTRIB_RELEASE} == '20.04' ]]; then
+  ROS_DISTRO='noetic'
+else
+  echo "Ubuntu distro ${DISTRIB_RELEASE} not supported by the installer"
+  exit 1
+fi
+echo "Ubuntu version is ${DISTRIB_RELEASE}, will install ROS distro ${ROS_DISTRO}"
+
 
 
 # ... Add new user ................................................................................
-P3D_USER='student'
-PASSWORD='percep3d'
+echo -e "\nAdd new user\n"
+
 P3D_USER_HOME="/home/${P3D_USER}"
 
 # $ sudo useradd -s /path/to/shell -d /home/{dirname} -m -G {secondary-group} {username}
@@ -38,16 +68,20 @@ sudo usermod -a -G sudo "${P3D_USER}"
 
 
 # .... Create required dir structure ..............................................................
-PERCEPT_LIBRARIES="/opt/percep3d_libraries"
+echo -e "\nCreate required dir structure\n"
+
+DS_ROS_ROOT="/opt/ros/${ROS_DISTRO}"
 ROS_DEV_WORKSPACE="${P3D_USER_HOME}/catkin_ws"
 
 mkdir -p "${DS_ROS_ROOT}"
 mkdir -p "${ROS_DEV_WORKSPACE}/src"
-mkdir -p "${PERCEPT_LIBRARIES}"
+mkdir -p "${PERCEPT_LIBRARIES_PATH}"
 mkdir -p "${P3D_USER_HOME}/percep3d_data"
 
 
 # . . Add archived files . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+echo -e "\nAdd archived files\n"
+
 sudo apt-get update \
     && sudo apt-get install --assume-yes \
         apt-utils \
@@ -65,23 +99,18 @@ rm beginner_tutorials.zip
 rm percep3d_mapping.zip
 
 
-# Fetch ros bag `husky_short_demo.bag`
-cd "${P3D_USER_HOME}/percep3d_data"
-wget -O husky_short_demo.zip "http://norlab.s3.valeria.science/percep3d/husky_short_demo.zip?AWSAccessKeyId=XMBLP3A0338XN5LASKV2&Expires=2319980812&Signature=n5HiUTunG7tcTINJovxH%2FtnGbM4%3D"
-unzip husky_short_demo.zip
-rm husky_short_demo.zip
 
 
 # ==== Install tools ==============================================================================
-cd "${ROS_DEV_WORKSPACE}"
+echo -e "\nInstall tools\n"
 
 # skip GUI dialog by setting everything to default
 export DEBIAN_FRONTEND=noninteractive
 
 # ... install development utilities ...............................................................
 sudo apt-get update \
+    && apt-get upgrade --assume-yes \
     && sudo apt-get install --assume-yes \
-        lsb-release \
         gnupg2 \
         g++ make cmake \
         build-essential \
@@ -96,6 +125,7 @@ sudo apt-get update \
         bash-completion \
         net-tools \
     && sudo rm -rf /var/lib/apt/lists/*
+
 
 
 # .... hardware acceleration in VM ................................................................
@@ -113,36 +143,40 @@ sudo apt-get update \
 
 
 # ===Service: ssh server===========================================================================
+VAGRANT_PRIMARY_PORT=22
 
-# install development utilities
-sudo apt-get update \
-    && sudo apt-get install --assume-yes  \
-        openssh-server \
-    && sudo apt-get clean \
-    && sudo rm -rf /var/lib/apt/lists/*
+if [[ ${SETUP_SSH_DAEMON} == true ]]; then
+  echo -e "\nInstall and configure ssh daemon\n"
+  VM_SSH_SERVER_PORT=2222
 
+  # install development utilities
+  sudo apt-get update \
+      && sudo apt-get install --assume-yes  \
+          openssh-server \
+      && sudo apt-get clean \
+      && sudo rm -rf /var/lib/apt/lists/*
 
-# ...Setup ssh server..............................................................................
-# Note: check that ssh is running `ps -aux | grep ssh`
+  # This will overright the vagrant box VAGRANT_PRIMARY_PORT
+  ( \
+      echo "LogLevel DEBUG2"; \
+      echo "PermitRootLogin yes"; \
+      echo "PasswordAuthentication yes"; \
+      echo "Port ${VM_SSH_SERVER_PORT}"; \
+    ) >> /etc/ssh/sshd_config \
+    && mkdir -p /run/sshd
 
-# ssh port, remaped from default 22 to 2222
-VM_SSH_SERVER_PORT=2222
+  sudo service ssh --full-restart
 
-# Inspired from https://austinmorlan.com/posts/docker_clion_development/
-( \
-    echo "LogLevel DEBUG2"; \
-    echo "PermitRootLogin yes"; \
-    echo "PasswordAuthentication yes"; \
-    echo "Port ${VM_SSH_SERVER_PORT}"; \
-  ) >> /etc/ssh/sshd_config \
-  && mkdir /run/sshd
-
-sudo service ssh --full-restart
-
+  echo -e "Check that ssh is running properly\n\n$(ps -aux | grep -e sshd -e USER)\n"
+else
+  echo -e "\nSkip ssh daemon install and configuration\n"
+  VM_SSH_SERVER_PORT=$VAGRANT_PRIMARY_PORT
+fi
 
 # ==== Install percept3D libraries and dependencies ===============================================
 
 # .... Dependencies ...............................................................................
+echo -e "\nInstall percept3D libraries and dependencies\n"
 
 if [[ ${ROS_DISTRO} == 'melodic' ]]; then
     sudo apt-get update \
@@ -175,96 +209,133 @@ fi
 
 
 
-# . . Install boost. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-# https://www.boost.org/doc/libs/1_79_0/more/getting_started/unix-variants.html
-sudo apt-get update \
-    && sudo apt-get install --assume-yes \
-        libboost-all-dev \
-    && sudo rm -rf /var/lib/apt/lists/*
+## . . Install boost. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+## https://www.boost.org/doc/libs/1_79_0/more/getting_started/unix-variants.html
+#sudo apt-get update \
+#    && sudo apt-get install --assume-yes \
+#        libboost-all-dev \
+#    && sudo rm -rf /var/lib/apt/lists/*
+#
+## . . Install eigen . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+#sudo apt-get update \
+#    && sudo apt-get install --assume-yes \
+#        libeigen3-dev \
+#    && sudo rm -rf /var/lib/apt/lists/*
+#
+## . . Install libnabo . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+#
+## (!) ANN was not mentionned in doc
+## ANN is a library written in C++, which supports data structures and algorithms for both exact and
+## approximate nearest neighbor searching in arbitrarily high dimensions.
+## https://www.cs.umd.edu/~mount/ANN/
+#cd "${ROS_DEV_WORKSPACE}"
+#wget https://www.cs.umd.edu/~mount/ANN/Files/1.1.2/ann_1.1.2.tar.gz
+#tar xzf ann_1.1.2.tar.gz
+#cd ann_1.1.2/
+#make linux-g++
+#sudo cp lib/libANN.a /usr/local/lib/
+#sudo cp include/ANN/ANN.h /usr/local/include/
+## shellcheck disable=SC2103
+#cd ..
+#
+#
+## (!) FLANN was not mentionned in doc
+## Fast Library for Approximate Nearest Neighbors - development
+## FLANN is a library for performing fast approximate nearest neighbor searches
+## in high dimensional spaces.
+## https://github.com/flann-lib/flann
+#sudo apt-get update \
+#    && sudo apt-get install --assume-yes \
+#        libflann-dev \
+#    && sudo rm -rf /var/lib/apt/lists/*
+#
+#
+#cd "${PERCEPT_LIBRARIES_PATH}"
+## https://github.com/ethz-asl/libnabo
+#git clone https://github.com/ethz-asl/libnabo.git \
+#    && cd libnabo \
+#    && mkdir build && cd build \
+#    && cmake -D CMAKE_BUILD_TYPE=RelWithDebInfo .. \
+#    && make -j $(nproc) \
+#    && make test \
+#    && sudo make install
+#
+##    && git checkout 1.0.7 \
+#
+## ToDo:on task end >> next bloc ↓↓
+##pwd && tree -L 3
+#
+## . . Install percept3D libraries. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+#cd "${PERCEPT_LIBRARIES_PATH}"
+#
+#sudo apt-get update \
+#    && sudo apt-get install --assume-yes \
+#        libyaml-cpp-dev \
+#    && sudo rm -rf /var/lib/apt/lists/*
+#
+## https://github.com/ethz-asl/libpointmatcher/tree/master
+#git clone https://github.com/ethz-asl/libpointmatcher.git \
+#    && cd libpointmatcher \
+#    && mkdir build && cd build \
+#    && cmake -D CMAKE_BUILD_TYPE=RelWithDebInfo \
+#            -D BUILD_TESTS=TRUE \
+#             .. \
+#    && make -j $(nproc) \
+#    && sudo make install
+#
+##            -DCMAKE_INSTALL_PREFIX=/usr/local/ \
+##    && git checkout 1.3.1 \
+#
+#cd "${PERCEPT_LIBRARIES_PATH}/libpointmatcher/build"
+#utest/utest --path "${PERCEPT_LIBRARIES_PATH}/libpointmatcher/examples/data/"
+#
+#
+#cd "${PERCEPT_LIBRARIES_PATH}"
+#git clone https://github.com/norlab-ulaval/norlab_icp_mapper.git \
+#    && mkdir -p norlab_icp_mapper/build && cd norlab_icp_mapper/build \
+#    && cmake -DCMAKE_BUILD_TYPE=Release .. \
+#    && make -j $(nproc) \
+#    && sudo make install
+#
+#
 
-# . . Install eigen . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-sudo apt-get update \
-    && sudo apt-get install --assume-yes \
-        libeigen3-dev \
-    && sudo rm -rf /var/lib/apt/lists/*
+# //// REFACTORING inprogress ↓↓ /////////////////////////////////////////////////////////////<--//
 
-# . . Install libnabo . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+echo -e "\nInstall libpointmatcher\n"
 
-# (!) ANN was not mentionned in doc
-# ANN is a library written in C++, which supports data structures and algorithms for both exact and
-# approximate nearest neighbor searching in arbitrarily high dimensions.
-# https://www.cs.umd.edu/~mount/ANN/
-cd "${ROS_DEV_WORKSPACE}"
-wget https://www.cs.umd.edu/~mount/ANN/Files/1.1.2/ann_1.1.2.tar.gz
-tar xzf ann_1.1.2.tar.gz
-cd ann_1.1.2/
-make linux-g++
-sudo cp lib/libANN.a /usr/local/lib/
-sudo cp include/ANN/ANN.h /usr/local/include/
-# shellcheck disable=SC2103
-cd ..
+cd "${PERCEPT_LIBRARIES_PATH}"
+git clone --recurse-submodules https://github.com/ethz-asl/libpointmatcher.git
+cd libpointmatcher
 
 
-# (!) FLANN was not mentionned in doc
-# Fast Library for Approximate Nearest Neighbors - development
-# FLANN is a library for performing fast approximate nearest neighbor searches
-# in high dimensional spaces.
-# https://github.com/flann-lib/flann
-sudo apt-get update \
-    && sudo apt-get install --assume-yes \
-        libflann-dev \
-    && sudo rm -rf /var/lib/apt/lists/*
+#wget https://bootstrap.pypa.io/get-pip.py
 
+# (CRITICAL) ToDo: validate >> this line ↓ (the yes pipe)
+yes 1 | bash libpointmatcher_dependencies_installer.bash
 
-cd "${PERCEPT_LIBRARIES}"
-# https://github.com/ethz-asl/libnabo
-git clone https://github.com/ethz-asl/libnabo.git \
-    && cd libnabo \
-    && mkdir build && cd build \
-    && cmake -D CMAKE_BUILD_TYPE=RelWithDebInfo .. \
-    && make -j $(nproc) \
-    && make test \
-    && sudo make install
+export APPEND_TO_CMAKE_FLAG=( "-D CMAKE_INSTALL_PREFIX=${PERCEPT_LIBRARIES_PATH:?err}" )
+source lpm_install_libpointmatcher_ubuntu.bash \
+      --compile-test \
+      --cmake-build-type RelWithDebInfo
 
-#    && git checkout 1.0.7 \
+# (CRITICAL) ToDo: on task end >> unmute next bloc ↓↓
+#cd "${PERCEPT_LIBRARIES_PATH}/libpointmatcher/build_system/ubuntu/"
+#bash lpm_execute_libpointmatcher_unittest.bash
 
-# ToDo:on task end >> next bloc ↓↓
-#pwd && tree -L 3
-
-# . . Install percept3D libraries. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-cd "${PERCEPT_LIBRARIES}"
-
-sudo apt-get update \
-    && sudo apt-get install --assume-yes \
-        libyaml-cpp-dev \
-    && sudo rm -rf /var/lib/apt/lists/*
-
-# https://github.com/ethz-asl/libpointmatcher/tree/master
-git clone https://github.com/ethz-asl/libpointmatcher.git \
-    && cd libpointmatcher \
-    && mkdir build && cd build \
-    && cmake -D CMAKE_BUILD_TYPE=RelWithDebInfo \
-            -D BUILD_TESTS=TRUE \
+echo -e "\nInstall norlab_icp_mapper\n"
+cd "${PERCEPT_LIBRARIES_PATH}"
+git clone https://github.com/norlab-ulaval/norlab_icp_mapper.git \
+    && mkdir -p norlab_icp_mapper/build && cd norlab_icp_mapper/build \
+    && cmake -D CMAKE_BUILD_TYPE=Release \
+             -D CMAKE_INSTALL_PREFIX=${PERCEPT_LIBRARIES_PATH:?err} \
              .. \
     && make -j $(nproc) \
     && sudo make install
 
-#            -DCMAKE_INSTALL_PREFIX=/usr/local/ \
-#    && git checkout 1.3.1 \
-
-cd "${PERCEPT_LIBRARIES}/libpointmatcher/build"
-utest/utest --path "${PERCEPT_LIBRARIES}/libpointmatcher/examples/data/"
-
-
-cd "${PERCEPT_LIBRARIES}"
-git clone https://github.com/norlab-ulaval/norlab_icp_mapper.git \
-    && mkdir -p norlab_icp_mapper/build && cd norlab_icp_mapper/build \
-    && cmake -DCMAKE_BUILD_TYPE=Release .. \
-    && make -j $(nproc) \
-    && sudo make install
-
+# //////////////////////////////////////////////////////////////// REFACTORING inprogress ////<--//
 
 # === ROS =========================================================================================
+echo -e "\nInstall ROS1\n"
 
 # ... register the ROS package source .............................................................
 # Setup sources.lst
@@ -307,18 +378,25 @@ else
         && sudo rosdep init;
 fi
 
+echo -e "\nInstall ROS1: rosdep update & install\n"
+
+apt-get update --fix-missing
 rosdep update
 sudo rosdep fix-permissions
 
-
-# . . Install ROS & build catkin workspace. . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 cd "${ROS_DEV_WORKSPACE}"
 sudo apt-get update \
-    && rosdep install --from-paths ./src --ignore-packages-from-source --rosdistro=${ROS_DISTRO} -y
+    && rosdep install --from-paths ./src \
+      --ignore-packages-from-source \
+      --rosdistro=${ROS_DISTRO} \
+      --include-eol-distros \
+      -y
 
+
+echo -e "\nInstall ROS1: execute catkin_make\n"
 
 source "${DS_ROS_ROOT}/setup.bash"
-catkin_make_isolated
+catkin_make
 source "${ROS_DEV_WORKSPACE}/devel/setup.bash"
 
 echo "source ${DS_ROS_ROOT}/setup.bash" >> ~/.bashrc
@@ -332,21 +410,26 @@ echo "source ${ROS_DEV_WORKSPACE}/devel/setup.bash" >> "${P3D_USER_HOME}/.bashrc
 
 
 ## . . Pull required repository. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+echo -e "\nPull ROS required repository\n"
+
 cd "${ROS_DEV_WORKSPACE}/src/"
-git clone https://github.com/norlab-ulaval/norlab_icp_mapper_ros.git
-git clone https://github.com/norlab-ulaval/libpointmatcher_ros.git
+# Note: --branch melodic should work for both ROS1 distro (noetic and melodic)
+git clone --branch melodic https://github.com/norlab-ulaval/norlab_icp_mapper_ros.git
+git clone --branch melodic https://github.com/norlab-ulaval/libpointmatcher_ros.git
 git clone https://github.com/norlab-ulaval/percep3d_turtle_exercises.git
 
 
 # . . Install ROS & build catkin workspace. . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+echo -e "\nInstall ROS required repository\n"
 cd "${ROS_DEV_WORKSPACE}"
 
 # (Priority) ToDo:validate >> next bloc
-#export ROS_PACKAGE_PATH=$ROS_PACKAGE_PATH:${PERCEPT_LIBRARIES}/norlab_icp_mapper
+#export ROS_PACKAGE_PATH=$ROS_PACKAGE_PATH:${PERCEPT_LIBRARIES_PATH}/norlab_icp_mapper
 
 sudo apt-get update
 source "${DS_ROS_ROOT}/setup.bash"
-catkin_make_isolated
+#catkin_make_isolated
+catkin_make
 source "${ROS_DEV_WORKSPACE}/devel/setup.bash"
 
 
@@ -361,70 +444,26 @@ sudo apt-get update \
 
 
 # .... install Paraview ...........................................................................
+echo -e "\nInstall Paraview\n"
+
 sudo apt-get update \
     && sudo apt-get install --assume-yes \
         paraview \
     && sudo rm -rf /var/lib/apt/lists/*
 
 
+# ....Fetch ros bag husky_short_demo.bag...........................................................
+echo -e "\nFetch ros bag husky_short_demo.bag\n"
 
-#
-## https://www.paraview.org
-#sudo apt-get update \
-#    && sudo apt-get install --assume-yes \
-#            python-dev \
-#            libgl1-mesa-dev \
-#            libxt-dev \
-#            qt5-default \
-#            libqt5x11extras5-dev \
-#            libqt5help5 \
-#            qttools5-dev \
-#            qtxmlpatterns5-dev-tools \
-#            libqt5svg5-dev \
-#            libopenmpi-dev \
-#            libtbb-dev \
-#            ninja-build \
-#            xvfb \
-#            mesa-utils \
-#            python-opengl \
-#            ffmpeg \
-##          python3-dev \
-##          python3-numpy \
-#    && sudo rm -rf /var/lib/apt/lists/*
-#
-#
-##wget https://www.paraview.org/paraview-downloads/download.php?submit=Download&version=v5.8&type=binary&os=Linux&downloadFile=ParaView-5.8.1-MPI-Linux-Python2.7-64bit.tar.gz
-#
-## . . Install ParaView for Linux dependencies: LLVM. . . . . . . . . . . . . . . . . . . . . . . .
-## Download the latest LLVM source: https://www.paraview.org/Wiki/ParaView_And_Mesa_3D
-#curl -L -O https://github.com/llvm/llvm-project/releases/download/llvmorg-11.0.0/llvm-11.0.0.src.tar.xz \
-#    && tar -xvf llvm-11.0.0.src.tar.xz \
-#    && mkdir llvm-11.0.0.bld && cd llvm-11.0.0.bld \
-#    && cmake -DCMAKE_BUILD_TYPE=Release                     \
-#             -DCMAKE_INSTALL_PREFIX=$HOME/llvm/install      \
-#             -DLLVM_BUILD_LLVM_DYLIB=ON                     \
-#             -DLLVM_ENABLE_RTTI=ON                          \
-#             -DLLVM_INSTALL_UTILS=ON                        \
-#             -DLLVM_TARGETS_TO_BUILD="ARM;X86;AArch64"      \
-#             ../llvm-11.0.0.src                             \
-#    && make -j $(nproc) \
-#    && sudo make install
-#
-## . . Installing Mesa llvmpipe and swr drivers . . . . . . . . . . . . . . . . . . . . . . . . . .
-#
-#
-#cd "/opt"
-#git clone https://gitlab.kitware.com/paraview/paraview.git \
-#    && mkdir paraview_build  \
-#    && cd paraview \
-#    && git checkout v5.8.0 \
-#    && git submodule update --init --recursive \
-#    && cd ../paraview_build \
-#    && cmake -GNinja -DPARAVIEW_USE_PYTHON=ON -DPARAVIEW_USE_MPI=ON -DVTK_SMP_IMPLEMENTATION_TYPE=TBB -DCMAKE_BUILD_TYPE=Release ../paraview \
-#    && ninja
+cd "${P3D_USER_HOME}/percep3d_data"
+wget -O husky_short_demo.zip "http://norlab.s3.valeria.science/percep3d/husky_short_demo.zip?AWSAccessKeyId=XMBLP3A0338XN5LASKV2&Expires=2319980812&Signature=n5HiUTunG7tcTINJovxH%2FtnGbM4%3D"
+unzip husky_short_demo.zip
+rm husky_short_demo.zip
 
 
 # ==== Final step =================================================================================
+echo -e "\nFinalize percep3d-software-install\n"
+
 # Make sure that you have your environment properly setup. A good way to check is to ensure that
 # environment variables like ROS_ROOT and ROS_PACKAGE_PATH are set:
 #   $ printenv | grep ROS
