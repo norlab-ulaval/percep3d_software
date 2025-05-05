@@ -31,14 +31,14 @@ RUN apt-get update \
 
 COPY beginner_tutorials.zip "."
 COPY percep3d_mapping.zip "."
-#RUN unzip beginner_tutorials.zip
-#RUN unzip percep3d_mapping.zip
 
-COPY install_percep3d_software.bash "/"
+COPY install_percep3d_software_ros2.bash "/"
+COPY ../utilities "/"
+COPY ../.git "/"
 
 
 # set read/write permission to entrypoint file
-RUN /bin/bash -c "chmod +x /install_percep3d_software.bash"
-RUN /bin/bash -c "/install_percep3d_software.bash"
-#ENTRYPOINT [ "/install_percep3d_software.bash" ]
+RUN /bin/bash -c "chmod +x /install_percep3d_software_ros2.bash"
+RUN /bin/bash -c "/install_percep3d_software_ros2.bash"
+#ENTRYPOINT [ "/install_percep3d_software_ros2.bash" ]
 CMD ["bash"]

@@ -59,7 +59,7 @@ $ vagrant destroy
 # Unit-test execution step on aarch arm64 (Apple M1 chips): 
 ```shell
 docker pull --platform linux/arm64 ubuntu:20.04
-docker build --platform linux/arm64 -f Dockerfile.test -t percep3d-vm-software-tester-ubuntu:20.04 . 
-docker run -a --name IAmPercep3D -t -i percep3d-vm-software-tester-ubuntu:20.04 
+docker build --platform linux/arm64 -f Dockerfile.test -t percep3d-vm-software-tester-ros1-ubuntu:20.04 . 
+docker run -a --name IAmPercep3D -t -i percep3d-vm-software-tester-ros1-ubuntu:20.04 
 ```
 
