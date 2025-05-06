@@ -1,5 +1,76 @@
-# Percep3D course software install 
-Maintainer: luc.coupal.1@ulaval.ca
+<div align="center">
+
+[//]: # ( ==== Logo ================================================== ) 
+<br>
+<br>
+<a href="https://norlab.ulaval.ca">
+    <picture>
+      <source media="(prefers-color-scheme: dark)" srcset="/visual/norlab_logo_acronym_light.png">
+      <source media="(prefers-color-scheme: light)" srcset="/visual/norlab_logo_acronym_dark.png">
+      <img alt="Shows an the dark NorLab logo in light mode and light NorLab logo in dark mode." src="/visual/norlab_logo_acronym_dark.png" width="175">
+    </picture>
+</a>
+<br>
+<br>
+
+[//]: # ( ==== Title ================================================= ) 
+# _Perception 3D course software install_
+
+[//]: # ( ==== Hyperlink ============================================= ) 
+
+[//]: # (    <a href="http://132.203.26.125:8111">NorLab TeamCity GUI</a>)
+[//]: # (    &#40;VPN/intranet access&#41; &nbsp; • &nbsp;)
+<sup>
+    <a href="https://github.com/norlab-ulaval">norlab-ulaval</a>
+    &nbsp; • &nbsp;
+    <a href="https://github.com/norlab-ulaval/percep3d_students">percep3D students</a>
+    &nbsp;
+</sup>
+<br>
+<br>
+
+[//]: # ( ==== Description =========================================== )
+**Software installation scripts and instructions for the Perception 3D robotics perception course**
+<br>
+<br>
+This repository contains installation scripts and detailed instructions for setting up the required <br>
+software environment for the Percep3D course. It supports both ROS1 and ROS2 installations on Ubuntu virtual <br>
+machines, including all necessary dependencies and configurations for robotics perception exercises.
+
+
+<br>
+
+[//]: # ( ==== Badges ================================================ ) 
+
+[![semantic-release: conventional commits](https://img.shields.io/badge/semantic--release-conventional_commits-453032?logo=semantic-release)](https://github.com/semantic-release/semantic-release)
+<img alt="GitHub release (with filter)" src="https://img.shields.io/github/v/release/norlab-ulaval/percep3d_software">
+
+
+[//]: # (NorLab teamcity)
+[//]: # (TODO: Un-comment the next line if your repository has run configuration enable on the norlab-teamcity-server)
+[//]: # (<a href="http://132.203.26.125:8111"><img src="https://img.shields.io/static/v1?label=JetBrains TeamCity&message=CI/CD&color=green?style=plastic&logo=teamcity" /></a>)
+
+[//]: # (Dockerhub image badge)
+[//]: # (TODO: Un-comment the next line if you have docker images on dockerhub)
+[//]: # (TODO: Change "norlabulaval/libpointmatcher" in both url to "your-dockerhub-domain/your-image-name")
+[//]: # (<a href="https://hub.docker.com/repository/docker/norlabulaval/libpointmatcher/"> <img alt="Docker Image Version &#40;latest semver&#41;" src="https://img.shields.io/docker/v/norlabulaval/libpointmatcher?logo=docker"> </a>)
+
+
+<br>
+
+[//]: # ( ==== Maintainer ============================================ ) 
+<sub>
+Maintainer <a href="https://redleader962.github.io">Luc Coupal</a><br>
+luc.coupal.1@ulaval.ca
+</sub>
+
+<br>
+<hr style="color:lightgray;background-color:lightgray">
+</div>
+
+[//]: # ( ==== Body ================================================== ) 
+
+
 
 ---
 
