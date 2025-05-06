@@ -4,8 +4,8 @@
 ENV["LC_ALL"] = "en_US.UTF-8"
 
 ## Set which virtual box
-#UBUNTU_BOX = "bento/ubuntu-22.04"
 UBUNTU_BOX = "bento/ubuntu-22.04" # https://portal.cloud.hashicorp.com/vagrant/discover/bento/ubuntu-22.04
+#UBUNTU_BOX = "bento/ubuntu-24.04"
 
 Vagrant.configure("2") do |config|
   # The most common configuration options are documented and commented below.
@@ -57,10 +57,10 @@ Vagrant.configure("2") do |config|
 
     # Customize the amount of memory on the VM:
     prl.memory = 16048
-    prl.cpus = 4
+    prl.cpus = 8
 
     # (CRITICAL) ToDo: Switch to false for release
-    prl.linked_clone = true
+    prl.linked_clone = false
   end
 
   # ====Multimachine config================
@@ -72,56 +72,67 @@ Vagrant.configure("2") do |config|
   config.vm.define "percep3d-vm-ros2", primary: true do |tcserver|
     tcserver.vm.box = UBUNTU_BOX
     tcserver.vm.hostname = "percep3d"
+    tcserver.vm.network "private_network", ip: "132.203.26.126"
     config.vm.network "forwarded_port", guest: 80, host: 8080
     # config.vm.network "forwarded_port", guest: 2222, host: 2222
+    # # tcserver.vm.network "forwarded_port", guest: 8111, host: 8111, guest_ip: "132.203.26.126"
     #
-    # tcserver.vm.network "private_network", ip: "132.203.26.125"
-    # # tcserver.vm.network "forwarded_port", guest: 8111, host: 8111, guest_ip: "132.203.26.125"
-    # tcserver.vm.provision "Check network", type: "shell", run: "always", inline: <<-SHELL
-    #     echo
-    #     echo "I am '$(whoami)', my address is $(ifconfig eth1 | grep inet | awk '$1==\"inet\" {print $2}')"
-    #     echo
-    # SHELL
+    tcserver.vm.provision "Check network", type: "shell", run: "always", inline: <<-SHELL
+        echo
+        echo "I am '$(whoami)', my address is $(ifconfig eth1 | grep inet | awk '$1==\"inet\" {print $2}')"
+        echo
+    SHELL
   end
 
   # ====Provisioning========================
-  config.vm.provision "shell", inline: <<-SHELL
-    export DEBIAN_FRONTEND=noninteractive
-    apt-get update
-    apt-get install --assume-yes --no-install-recommends \
-        locales \
-        sudo \
-        apt-utils \
-        lsb-release \
-        ca-certificates \
-        software-properties-common \
-        build-essential \
-        bash-completion \
-        fontconfig \
-        vim \
-        tree \
-        git \
-        curl \
-        wget \
-        gnupg2 \
-        zip gzip tar unzip \
-        rsync \
-        net-tools \
-        dnsutils
+  $INLINE_SCRIPT = <<-'SCRIPT'
 
-#     # (Priority) ToDo: assessment >> next bloc ↓↓
-#     apt-get install --assume-yes --no-install-recommends ubuntu-desktop
+  ( \
+      echo "# =====Quick-hack: Override needrestart configuration====="; \
+      echo "# needrestart: checks which daemons need to be restarted after library upgrades"; \
+      echo "# i.e. the pink famous console screen"; \
+      echo "# ref: https://manpages.ubuntu.com/manpages/focal/man1/needrestart.1.html"; \
+      echo "# - a=>automatic"; \
+      echo "# - l=>list only"; \
+      echo "# - i=>interactive"; \
+      echo "\$nrconf{restart} = 'a';"; \
+      echo ""; \
+  ) | tee /etc/needrestart/conf.d/no-prompt.conf
 
-#     # (Priority) ToDo: assessment >> next bloc ↓↓
-#     locale-gen en_US en_US.UTF-8 && update-locale LC_ALL=en_US.UTF-8 LANG=en_US.UTF-8
+  export DEBIAN_FRONTEND=noninteractive
+  apt-get update
+  apt-get install --assume-yes \
+      locales \
+      sudo \
+      apt-utils \
+      lsb-release \
+      ca-certificates \
+      software-properties-common \
+      build-essential \
+      bash-completion \
+      fontconfig \
+      vim \
+      tree \
+      git \
+      curl \
+      wget \
+      gnupg2 \
+      zip gzip tar unzip \
+      rsync \
+      net-tools \
+      dnsutils
 
-    # sudo reboot
+  echo "Set dev default landing path"
+  echo "cd /opt/percep3d_software/vm_software_install_ros2" >> /home/vagrant/.bashrc
 
-    # (Priority) ToDo: validate >> next bloc ↓↓
-    echo "Set default landing path"
-    echo "cd /opt/percep3d_software/vm_software_install_ros2" >> /home/vagrant/.bashrc
+  apt-get install --assume-yes --no-install-recommends ubuntu-desktop
+  SCRIPT
 
-  SHELL
+  config.vm.provision :shell do |shell|
+    shell.inline = $INLINE_SCRIPT
+    shell.privileged = true
+    shell.reboot = true
+  end
 
   # Execute rsync from the host on 'vagrant up' trigger
   config.trigger.after :up do |trigger|

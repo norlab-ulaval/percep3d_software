@@ -1,10 +1,10 @@
 ARG BASE_IMAGE=ubuntu:20.04
 FROM ${BASE_IMAGE} AS base-image
-MAINTAINER luc.coupal.1@ulaval.ca
 
-WORKDIR "/"
-
+LABEL org.opencontainers.image.authors="luc.coupal.1@ulaval.ca"
 ARG DEBIAN_FRONTEND=noninteractive
+
+SHELL ["/bin/bash", "-c"]
 
 # install development utilities
 RUN apt-get update \
@@ -26,19 +26,17 @@ RUN apt-get update \
         zip gzip tar unzip \
     && rm -rf /var/lib/apt/lists/*
 
+WORKDIR "/"
+
 #RUN useradd -m docker && echo "docker:docker" | chpasswd && adduser docker sudo
 #USER docker
 
-COPY beginner_tutorials.zip "."
-COPY percep3d_mapping.zip "."
-
-COPY install_percep3d_software_ros1.bash "/"
-COPY ../utilities "/"
-COPY ../.git "/"
+COPY vm_software_install_ros1 "/vm_software_install_ros1"
+COPY utilities "/utilities"
+COPY .git "/.git"
 
 
-# set read/write permission to entrypoint file
-RUN /bin/bash -c "chmod +x /install_percep3d_software_ros1.bash"
-RUN /bin/bash -c "/install_percep3d_software_ros1.bash"
-#ENTRYPOINT [ "/install_percep3d_software_ros1.bash" ]
+WORKDIR vm_software_install_ros1
+RUN chmod +x install_percep3d_software_ros1.bash
+RUN bash install_percep3d_software_ros1.bash
 CMD ["bash"]

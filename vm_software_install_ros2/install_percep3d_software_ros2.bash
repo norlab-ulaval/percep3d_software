@@ -22,7 +22,7 @@ set -e # Note: we want the installer to always fail-fast (it wont affect the bui
 
 
 # ....Hardcoded environment variable...............................................................
-ROS_PKG='desktop_full'
+ROS_PKG='desktop-full'
 P3D_USER='student'
 PASSWORD='percep3d'
 PERCEPT_LIBRARIES_PATH="/opt/percep3d_libraries"
@@ -32,6 +32,12 @@ SETUP_SSH_DAEMON=${SETUP_SSH_DAEMON:-true} # Skip ssh daemon setup if set to fal
 VAGRANT_SSH_PORT=22
 
 SHOW_SPLASH_IDU="${SHOW_SPLASH_IDU:-false}"
+
+P3D_USER_HOME="/home/${P3D_USER}"
+P3D_ROS_DEV_WORKSPACE="${P3D_USER_HOME}/ros2_ws"
+
+# skip GUI dialog by setting everything to default
+export DEBIAN_FRONTEND=noninteractive
 
 # ....Project root logic...........................................................................
 TMP_CWD=$(pwd)
@@ -53,49 +59,45 @@ source import_norlab_shell_script_tools_lib.bash
 apt-get update && \
   apt-get install --assume-yes --no-install-recommends \
       locales \
+      lsb-release \
   && rm -rf /var/lib/apt/lists/* \
   && locale-gen en_US en_US.UTF-8 \
-  && update-locale LC_ALL=en_US.UTF-8 LANG=en_US.UTF-8
+  && update-locale LC_ALL=en_US.UTF-8 LANG=en_US.UTF-8 \
+  && export LANG=en_US.UTF-8
+
+#locale
 
 if [[ "${SHOW_SPLASH_IDU}" == 'true' ]]; then
   n2st::norlab_splash "Percep3D course software install" "https://github.com/norlab-ulaval/percep3d_software"
 fi
-
 n2st::print_formated_script_header "install_percep3d_software_ros2.bash"
 
 
 # ....Auto set ROS distro..........................................................................
 n2st::print_formated_script_header "Auto set ROS distro" "."
-#n2st::print_msg "Auto set ROS distro"
-
-apt-get update \
-  && apt-get install --assume-yes \
-      lsb-release \
-  && rm -rf /var/lib/apt/lists/*
 
 # Retrieve ubuntu version number: DISTRIB_RELEASE
 source /etc/lsb-release
 if [[ ${DISTRIB_RELEASE} == '20.04' ]]; then # Ubuntu focal
-#  ROS_DISTRO='foxy'
-  ROS_DISTRO='galactic'
+  P3D_ROS_DISTRO='foxy'
+  # P3D_ROS_DISTRO='galactic'
 elif [[ ${DISTRIB_RELEASE} == '22.04' ]]; then # Ubuntu jammy
-  ROS_DISTRO='humble'
-#  ROS_DISTRO='iron'
+  P3D_ROS_DISTRO='humble'
+#   P3D_ROS_DISTRO='iron'
 elif [[ ${DISTRIB_RELEASE} == '24.04' ]]; then # Ubuntu noble
-  ROS_DISTRO='jazzy'
+  P3D_ROS_DISTRO='jazzy'
 else
   n2st::print_msg_error_and_exit "Ubuntu distro ${DISTRIB_RELEASE} not supported by the installer"
 fi
-echo "Ubuntu version is ${DISTRIB_RELEASE}, will install ROS2 distro ${ROS_DISTRO}"
+P3D_ROS_ROOT="/opt/ros/${P3D_ROS_DISTRO}"
+n2st::print_msg "Ubuntu version is ${DISTRIB_RELEASE}, will install ROS2 distro ${P3D_ROS_DISTRO} at ${P3D_ROS_ROOT}"
 
 
+# ====Begin========================================================================================
 
 # ... Add new user ................................................................................
 n2st::print_formated_script_header "Add new user" "."
 
-P3D_USER_HOME="/home/${P3D_USER}"
-
-# $ useradd -s /path/to/shell -d /home/{dirname} -m -G {secondary-group} {username}
 useradd -s /bin/bash -d "${P3D_USER_HOME}" -m "${P3D_USER}" \
   && yes "${PASSWORD}" | passwd "${P3D_USER}"
 # Add sudo group to P3D_USER
@@ -108,14 +110,15 @@ usermod -a -G sudo "${P3D_USER}"
 # .... Create required dir structure ..............................................................
 n2st::print_formated_script_header "Create required dir structure" "."
 
-P3D_ROS_ROOT="/opt/ros/${ROS_DISTRO}"
-P3D_ROS_DEV_WORKSPACE="${P3D_USER_HOME}/ros2_ws"
-
 mkdir -p "${P3D_ROS_ROOT}"
 mkdir -p "${P3D_ROS_DEV_WORKSPACE}/src"
 mkdir -p "${PERCEPT_LIBRARIES_PATH}"
 mkdir -p "${P3D_USER_HOME}/percep3d_data"
 
+tree -L 1 ${P3D_ROS_ROOT}
+tree -L 1 ${P3D_ROS_DEV_WORKSPACE}
+tree -L 1 ${PERCEPT_LIBRARIES_PATH}
+tree -L 1 ${P3D_USER_HOME}
 
 # . . Add archived files . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 n2st::print_formated_script_header "Add archived files" "."
@@ -126,30 +129,25 @@ apt-get update \
         zip gzip tar unzip \
     && rm -rf /var/lib/apt/lists/*
 
-cd "${P3DS_PATH}/vm_software_install_ros2" || exit 1
-
-# (CRITICAL) Don't execute `cd` before the folling lines
-cp "./beginner_tutorials.zip" "${P3D_ROS_DEV_WORKSPACE}/src"
-cp "./percep3d_mapping.zip" "${P3D_ROS_DEV_WORKSPACE}/src"
-
-cd "${P3D_ROS_DEV_WORKSPACE}/src"
-unzip beginner_tutorials.zip
-unzip percep3d_mapping.zip
-rm beginner_tutorials.zip
-rm percep3d_mapping.zip
-
-
+# //// TEMP MUTE //////////////////////////////////////////////////////////////////////////////////
+# (CRITICAL) ToDo: skip installing those 2 zip files until they are refactored for ROS2
+#cd "${P3DS_PATH}/vm_software_install_ros2" || exit 1
+#cp "./beginner_tutorials.zip" "${P3D_ROS_DEV_WORKSPACE}/src"
+#cp "./percep3d_mapping.zip" "${P3D_ROS_DEV_WORKSPACE}/src"
+#
+#cd "${P3D_ROS_DEV_WORKSPACE}/src"
+#unzip beginner_tutorials.zip
+#unzip percep3d_mapping.zip
+#rm beginner_tutorials.zip
+#rm percep3d_mapping.zip
+# \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\ TEMP MUTE \\\\
 
 
 # ==== Install tools ==============================================================================
 n2st::print_formated_script_header "Install tools" "."
 
-# skip GUI dialog by setting everything to default
-export DEBIAN_FRONTEND=noninteractive
-
 # ... install development utilities ...............................................................
 apt-get update \
-    && apt-get upgrade --assume-yes \
     && apt-get install --assume-yes \
         gnupg2 \
         g++ make cmake \
@@ -164,8 +162,8 @@ apt-get update \
         tree \
         bash-completion \
         net-tools \
+        python-is-python3 \
     && rm -rf /var/lib/apt/lists/*
-
 
 
 # .... hardware acceleration in VM ................................................................
@@ -181,10 +179,7 @@ apt-get update \
 )  >> ${P3D_USER_HOME}/.bashrc
 
 
-
 # ===Service: ssh server===========================================================================
-
-
 n2st::print_formated_script_header "ssh daemon setup" "."
 
 if [[ ${SETUP_SSH_DAEMON} == true ]]; then
@@ -195,7 +190,6 @@ if [[ ${SETUP_SSH_DAEMON} == true ]]; then
   apt-get update \
       && apt-get install --assume-yes  \
           openssh-server \
-      && apt-get clean \
       && rm -rf /var/lib/apt/lists/*
 
   # This will overright the vagrant box VAGRANT_SSH_PORT
@@ -221,16 +215,14 @@ fi
 n2st::print_formated_script_header "Install percep3D libraries and dependencies" "."
 
 apt-get update \
+  && apt-get upgrade --assume-yes \
     && apt-get install --assume-yes \
         python3-dev \
         python3-opengl \
         python3-numpy \
         python3-pip \
-    && rm -rf /var/lib/apt/lists/*;
-#        python-is-python3 \
-
-python3 -m pip install --upgrade pip
-
+    && rm -rf /var/lib/apt/lists/* \
+    && python3 -m pip install --upgrade pip
 
 n2st::print_formated_script_header "Install libpointmatcher" "."
 
@@ -247,10 +239,25 @@ if [[ ${DISTRIB_RELEASE} == '20.04' ]]; then
   n2st::seek_and_modify_string_in_file "$SEEK_STR" "$CHANGE_TO" "$FILE_TO_CHANGE"
 fi
 
-yes 1 | bash libpointmatcher_dependencies_installer.bash || exit 1
 
+# //// Temp solution //////////////////////////////////////////////////////////////////////////////
+## (Priority) ToDo: unmute when installer as the option to skip doc install (ref task NMO-605).
+##
+#yes | bash libpointmatcher_dependencies_installer.bash || exit 1
+##
+## Use manual install step in the mean time
+cd "${PERCEPT_LIBRARIES_PATH}"/libpointmatcher/build_system/ubuntu || exit 1
+yes | source lpm_install_dependencies_general_ubuntu.bash || exit 1
+cd "${PERCEPT_LIBRARIES_PATH}"/libpointmatcher/build_system/ubuntu || exit 1
+yes | source lpm_install_dependencies_libnabo_ubuntu.bash || exit 1
+# \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\ Temp solution \\\\
+
+
+cd "${PERCEPT_LIBRARIES_PATH}/libpointmatcher"
 export APPEND_TO_CMAKE_FLAG=( "-D CMAKE_INSTALL_PREFIX=${PERCEPT_LIBRARIES_PATH:?err}" )
-# (CRITICAL) ToDo: fix(LPM installer): `--build-system-CI-install` logic should be the default in LPM installer
+# (CRITICAL) ToDo: fix(LPM installer): `--build-system-CI-install` logic should be the default
+#   in LPM installer.
+#   Ref task NMO-602 fix(installer): set LPM user installer to skip repo clone step by default
 bash libpointmatcher_installer.bash \
       --compile-test \
       --build-system-CI-install \
@@ -258,8 +265,8 @@ bash libpointmatcher_installer.bash \
     || exit 1
 
 # (CRITICAL) ToDo: on task end >> unmute next bloc ↓↓
-#cd "${PERCEPT_LIBRARIES_PATH}/libpointmatcher/build_system/ubuntu/"
-#bash lpm_execute_libpointmatcher_unittest.bash
+cd "${PERCEPT_LIBRARIES_PATH}/libpointmatcher/build_system/ubuntu/"
+bash lpm_execute_libpointmatcher_unittest.bash
 
 n2st::print_formated_script_header "Install norlab_icp_mapper" "."
 cd "${PERCEPT_LIBRARIES_PATH}"
@@ -274,27 +281,24 @@ git clone https://github.com/norlab-ulaval/norlab_icp_mapper.git \
 
 
 # === ROS =========================================================================================
-# //// REFACTORING inprogress ↓↓ /////////////////////////////////////////////////////////////<--//
 n2st::print_formated_script_header "Install ROS2" "."
 
 # ... register the ROS package source .............................................................
 apt-get update \
     && apt-get upgrade --assume-yes \
-    && apt-get install --assume-yes --no-install-recommends \
+    && apt-get install --assume-yes \
         software-properties-common \
         python3-argcomplete \
     && rm -rf /var/lib/apt/lists/* \
-    && add-apt-repository universe \
+    && add-apt-repository -y universe \
     && curl -sSL https://raw.githubusercontent.com/ros/rosdistro/master/ros.key -o /usr/share/keyrings/ros-archive-keyring.gpg \
-    && echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/ros-archive-keyring.gpg] http://packages.ros.org/ros2/ubuntu $(. /etc/os-release && echo $UBUNTU_CODENAME) main" | tee /etc/apt/sources.list.d/ros2.list > /dev/null
-
+    && echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/ros-archive-keyring.gpg] http://packages.ros.org/ros2/ubuntu $(. /etc/os-release && echo ${UBUNTU_CODENAME}) main" | sudo tee /etc/apt/sources.list.d/ros2.list > /dev/null
 
 
 # ====Install ROS2=================================================================================
 
 # update-alternatives --install /usr/bin/python python /usr/bin/python3 1 \
 #   && update-alternatives --install /usr/bin/pip pip /usr/bin/pip3 1
-
 
 # Note:
 #   - ref cmake upgrade via pip:
@@ -306,10 +310,7 @@ apt-get update \
 #   - pip 'flake8-blind-except' version
 #       ref https://github.com/ros2/examples/issues/325#issuecomment-936131710
 apt-get update --fix-missing \
-  && apt-get install --assume-yes --no-install-recommends \
-      apt-utils \
-      lsb-release \
-      build-essential \
+  && apt-get install --assume-yes \
       clang \
       gdb \
       libbullet-dev \
@@ -319,43 +320,40 @@ apt-get update --fix-missing \
       python3-pycodestyle \
       python3-pygments \
       python3-flake8 \
-  && apt-get clean \
   && rm -rf /var/lib/apt/lists/* \
   && python3 -m pip install --upgrade pip \
   && pip3 install --no-cache-dir  \
       scikit-build \
       six \
       msgpack \
-  && pip3 install --upgrade --no-cache-dir \
-      setuptools==58.2.0 \
-      pyparsing==2.4.7 \
   && pip3 install --upgrade --no-cache-dir  \
       cmake
+
+#  && pip3 install --upgrade --no-cache-dir \
+#      setuptools==58.2.0 \
+#      pyparsing==2.4.7 \
 
 # Note: ROS2 doc recommend executing 'apt upgrade' just before installing ros
 apt-get update --fix-missing \
   && apt-get upgrade --assume-yes \
-  && apt-get install --assume-yes --no-install-recommends \
-      ros-"${ROS_DISTRO}"-"${ROS_PKG}" \
+  && apt-get install --assume-yes \
+      ros-"${P3D_ROS_DISTRO}"-$(echo "${ROS_PKG}" | tr '_' '-') \
       ros-dev-tools \
   && dpkg --configure -a \
-  && apt-get clean \
   && rm -rf /var/lib/apt/lists/*
 
 # Note: pytest version is managed by 'colcon-common-extensions'
 apt-get update --fix-missing \
-  && apt-get install --assume-yes --no-install-recommends \
+  && apt-get install --assume-yes \
       python3-rosdep \
       python3-colcon-common-extensions \
       python3-colcon-mixin \
       libasio-dev \
       libtinyxml2-dev \
       libcunit1-dev \
-  && apt-get clean \
   && rm -rf /var/lib/apt/lists/* \
   && echo "Install python testing tools" \
   && pip3 install --upgrade --no-cache-dir \
-      flake8-blind-except==0.1.1 \
       flake8-builtins \
       flake8-class-newline \
       flake8-comprehensions \
@@ -374,14 +372,13 @@ apt-get update --fix-missing \
       pytest-rerunfailures \
       pytest-runner
 
+#      flake8-blind-except==0.1.1 \
 
 apt-get update --fix-missing \
   && apt-get install --assume-yes --no-install-recommends \
-      ros-"${ROS_DISTRO}"-rosbridge-server \
-      ros-"${ROS_DISTRO}"-rqt-graph \
-      ros-"${ROS_DISTRO}"-rviz2 \
-      tree \
-  && apt-get clean \
+      ros-"${P3D_ROS_DISTRO}"-rosbridge-server \
+      ros-"${P3D_ROS_DISTRO}"-rqt-graph \
+      ros-"${P3D_ROS_DISTRO}"-rviz2 \
   && rm -rf /var/lib/apt/lists/*
 
 
@@ -392,73 +389,87 @@ apt-get update --fix-missing \
 # && apt-get install --assume-yes \
 #     python3-catkin-pkg \
 #     python3-catkin-pkg-modules \
-# && apt-get clean \
 # && rm -rf /var/lib/apt/lists/*
 
+
+
 # ====Build ROS2 workspace=========================================================================
+n2st::print_formated_script_header "Build ROS2 workspace" "."
 cd "${P3D_ROS_DEV_WORKSPACE}/src/"
 
+# //// Consider fetching the full repo ////////////////////////////////////////////////////////////
 # Note: The goal is to have a minimum ros package to build. Only fetch rclpy as rclcpp is a lot
 #        longer to build especily on non-native architecture.
-git clone --depth=1 https://github.com/ros2/examples src/ros2_examples -b ${ROS_DISTRO} \
-    && cd src/ros2_examples \
+mkdir -p "${P3D_ROS_DEV_WORKSPACE}/src/ros2_examples"
+git clone --depth=1 https://github.com/ros2/examples ros2_examples -b "${P3D_ROS_DISTRO}" \
+    && cd ros2_examples \
     && git sparse-checkout set --no-cone rclpy/topics/minimal_publisher rclpy/topics/minimal_subscriber \
     && cd rclpy/topics/minimal_publisher || exit 1 \
     && cd - && cd rclpy/topics/minimal_subscriber || exit 1
 
+## Note: The goal is to have a minimum ros package to build.
+#mkdir -p "${P3D_ROS_DEV_WORKSPACE}/src/ros2_examples"
+#git clone --branch "${P3D_ROS_DISTRO}" https://github.com/ros2/examples ros2_examples
+# \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\ Consider fetching the full repo \\\\
 
-# Note: For some reason, building ros2 example under ROS foxy focal linux/amd64 fail when \
-#       "rosdep update" use those flags:
-#        $ rosdep update --rosdistro ${ROS_DISTRO} --include-eol-distros \
-echo "sourcing /opt/ros/${ROS_DISTRO}/setup.bash" \
-    && source /opt/ros/"${ROS_DISTRO}"/setup.bash \
+# Note: For some reason, building ros2 example under ROS foxy focal linux/amd64 fail when rosdep
+#       update use those flags: $ rosdep update --rosdistro ${P3D_ROS_DISTRO} --include-eol-distros
+echo && n2st::print_msg "Run rosdep init" \
+    && cd "${P3D_ROS_DEV_WORKSPACE}" \
+    && source "/opt/ros/${P3D_ROS_DISTRO}/setup.bash" \
     && apt-get update --fix-missing \
-    && rosdep init \
-    && rosdep update
+    && sudo rosdep init \
+    && rosdep update --rosdistro "${P3D_ROS_DISTRO}" \
+    && rosdep fix-permissions \
+    || exit 1
 
-    #    && rosdep fix-permissions
 
 colcon mixin add default https://raw.githubusercontent.com/colcon/colcon-mixin-repository/master/index.yaml  \
     && colcon mixin update  \
     && colcon metadata add default https://raw.githubusercontent.com/colcon/colcon-metadata-repository/master/index.yaml  \
-    && colcon metadata update
+    && colcon metadata update  \
+    || exit 1
 
-cd "${P3D_ROS_DEV_WORKSPACE}"
-
-echo "sourcing /opt/ros/${ROS_DISTRO}/setup.bash" \
-    && source /opt/ros/"${ROS_DISTRO}"/setup.bash \
-    && tree src/ros2_examples \
+echo && n2st::print_msg "Run rosdep install" \
+    && source "/opt/ros/${P3D_ROS_DISTRO}/setup.bash" \
+    && cd "${P3D_ROS_DEV_WORKSPACE}" \
+    && tree -L 2 \
     && rosdep install  \
             --ignore-packages-from-source \
-            --from-path ./src  \
-            --rosdistro "${ROS_DISTRO}"  \
+            --from-path src  \
+            --rosdistro "${P3D_ROS_DISTRO}" \
             -y \
-    && colcon version-check
+    && colcon version-check \
+    || exit 1
 
-declare -a COLCON_FLAGS
+#            --include-eol-distros \
+
 
 # Note: The colcon flag "--cmake-clean-cache" reset the python3 env
 COLCON_FLAGS=()
 COLCON_FLAGS+=(--symlink-install)
 #COLCON_FLAGS+=(--executor sequential) # alternative if symlink install is unstable
 COLCON_FLAGS+=( \
-      --cmake-clean-cache \
-      --cmake-args -DCMAKE_BUILD_TYPE=Release \
-      --event-handlers console_direct+ \
+      "--cmake-clean-cache" \
+      "--cmake-args" "-DCMAKE_BUILD_TYPE=Release" \
+      "--event-handlers" "console_direct+" \
    )
-echo -e "COLCON_FLAGS=(${COLCON_FLAGS[*]})"
-
-echo "sourcing /opt/ros/${ROS_DISTRO}/setup.bash and run colcon build" \
-  && source /opt/ros/"${ROS_DISTRO}"/setup.bash \
-  && colcon build "${COLCON_FLAGS[@]}"
+echo && n2st::print_msg "Run colcon build ${COLCON_FLAGS[*]}" \
+    && source "/opt/ros/${P3D_ROS_DISTRO}/setup.bash" \
+    && cd "${P3D_ROS_DEV_WORKSPACE}" \
+    && colcon build "${COLCON_FLAGS[@]}" \
+    || exit 1
 
 
 # ....ROS2 install sanity check....................................................................
-echo "sourcing /opt/ros/${ROS_DISTRO}/setup.bash" \
-  && source /opt/ros/"${ROS_DISTRO}"/setup.bash \
+n2st::print_formated_script_header "ROS2 install sanity check" "."
+
+echo "sourcing /opt/ros/${P3D_ROS_DISTRO}/setup.bash" \
+  && source "/opt/ros/${P3D_ROS_DISTRO}/setup.bash" \
   && echo "sourcing ${P3D_ROS_DEV_WORKSPACE}/install/setup.bash" \
   && source "${P3D_ROS_DEV_WORKSPACE}"/install/setup.bash \
   && echo "Sanity check" \
+  && echo "" \
   && echo ROS_VERSION="${ROS_VERSION:?'Build argument needs to be set and non-empty.'}" \
   && echo ROS_PYTHON_VERSION="${ROS_PYTHON_VERSION:?'Build argument needs to be set and non-empty.'}" \
   && echo ROS_DISTRO="${ROS_DISTRO:?'Build argument needs to be set and non-empty.'}" \
@@ -466,8 +477,11 @@ echo "sourcing /opt/ros/${ROS_DISTRO}/setup.bash" \
   && echo PYTHONPATH="${PYTHONPATH:?'Build argument needs to be set and non-empty.'}" \
   && echo AMENT_PREFIX_PATH="${AMENT_PREFIX_PATH:?'Build argument needs to be set and non-empty.'}" \
   && echo COLCON_PREFIX_PATH="${COLCON_PREFIX_PATH:?'Build argument needs to be set and non-empty.'}" \
+  && echo "" \
   && python -c "import rclpy" \
   && ros2 pkg list \
+  && echo "" \
+  && cd "${P3D_ROS_DEV_WORKSPACE}" \
   && colcon --log-level error test-result --all --verbose \
   || exit 1
 
@@ -478,55 +492,62 @@ echo "Check workspace directory installation"  \
     && [[ -d ${P3D_ROS_DEV_WORKSPACE}/src ]] \
     || exit 1
 
-
-n2st::print_formated_script_header "Install ROS2: build workspace" "."
-
-echo "source ${P3D_ROS_ROOT}/setup.bash" >> ~/.bashrc
-echo "source ${P3D_ROS_DEV_WORKSPACE}/install/setup.bash" >> ~/.bashrc
+echo "source ${P3D_ROS_ROOT}/setup.bash" >> "${HOME}/.bashrc"
+echo "source ${P3D_ROS_DEV_WORKSPACE}/install/setup.bash" >> "${HOME}/.bashrc"
 echo "source ${P3D_ROS_ROOT}/setup.bash" >> "${P3D_USER_HOME}/.bashrc"
 echo "source ${P3D_ROS_DEV_WORKSPACE}/install/setup.bash" >> "${P3D_USER_HOME}/.bashrc"
 
 
-## . . Pull required repository. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-n2st::print_formated_script_header "Pull ROS required repository" "."
+# ====Install Percep3D ROS2 app====================================================================
+n2st::print_formated_script_header "Install Percep2D ROS2 app" "-"
 
-cd "${P3D_ROS_DEV_WORKSPACE}/src/"
-git clone --branch "${ROS_DISTRO}" https://github.com/norlab-ulaval/norlab_icp_mapper_ros.git
-git clone --branch "${ROS_DISTRO}" https://github.com/norlab-ulaval/libpointmatcher_ros.git
-git clone https://github.com/norlab-ulaval/percep3d_turtle_exercises.git
-
-
-# . . Install ROS & build catkin workspace. . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-n2st::print_formated_script_header "Install ROS required repository" "."
-cd "${P3D_ROS_DEV_WORKSPACE}"
-
-# (Priority) ToDo:validate >> next bloc
-#export ROS_PACKAGE_PATH=$ROS_PACKAGE_PATH:${PERCEPT_LIBRARIES_PATH}/norlab_icp_mapper
-
-# (Priority) ToDo:validate >> next bloc
-#export CMAKE_PREFIX_PATH="${PERCEPT_LIBRARIES_PATH:?err}:${CMAKE_PREFIX_PATH}"
-#echo "export CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}" >> ~/.bashrc
-#echo "export CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}" >> "${P3D_USER_HOME}/.bashrc"
+# . . Install percep3d required ros2 package . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+n2st::print_formated_script_header "Install percep3d required ros2 package" "."
 
 # Required dependencies for tutorial: Introduction to tf https://wiki.ros.org/tf/Tutorials/Introduction%20to%20tf
 # Note: tf is deprecated in favor of tf2 ››› Install tf2 for tutorial in exo module 2.4
 apt-get update \
     && apt-get install --assume-yes \
-          ros-"${ROS_DISTRO}"-turtle-tf2 \
-          ros-"${ROS_DISTRO}"-tf2-tools \
-          ros-"${ROS_DISTRO}"-tf \
+          ros-"${P3D_ROS_DISTRO}"-turtle-tf2-py \
+          ros-"${P3D_ROS_DISTRO}"-tf2-ros \
+          ros-"${P3D_ROS_DISTRO}"-tf2-tools \
+          ros-"${P3D_ROS_DISTRO}"-turtlesim \
     && rm -rf /var/lib/apt/lists/*
 
+# . . Pull percep3d ros2 required repository. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+n2st::print_formated_script_header "Pull percep3d ros2 required repository" "."
 
-apt-get update --fix-missing
-    rosdep update --rosdistro "${ROS_DISTRO}" --include-eol-distros
-    rosdep fix-permissions
-    rosdep install \
+cd "${P3D_ROS_DEV_WORKSPACE}/src/"
+git clone --branch "${P3D_ROS_DISTRO}" https://github.com/norlab-ulaval/norlab_icp_mapper_ros.git
+git clone --branch "${P3D_ROS_DISTRO}" https://github.com/norlab-ulaval/libpointmatcher_ros.git
+
+# //// TEMP MUTE //////////////////////////////////////////////////////////////////////////////////
+## (CRITICAL) ToDo: skip installing this repo until he is refactored for ROS2echo
+#git clone https://github.com/norlab-ulaval/percep3d_turtle_exercises.git
+# \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\ TEMP MUTE \\\\
+
+
+# . . Build percep3d ros2 required packages . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+n2st::print_formated_script_header "Build percep3d ros2 required packages" "."
+cd "${P3D_ROS_DEV_WORKSPACE}"
+
+source "/opt/ros/${P3D_ROS_DISTRO}/setup.bash"
+source "${P3D_ROS_DEV_WORKSPACE}/install/setup.bash"
+export CMAKE_PREFIX_PATH="${PERCEPT_LIBRARIES_PATH:?err}:${CMAKE_PREFIX_PATH}"
+
+echo && n2st::print_msg "Run rosdep install" \
+    && apt-get update --fix-missing \
+    && cd "${P3D_ROS_DEV_WORKSPACE}" \
+    && rosdep update --rosdistro "${P3D_ROS_DISTRO}" \
+    && rosdep fix-permissions \
+    && rosdep install \
         --ignore-packages-from-source \
         --from-path ./src  \
-        --rosdistro "${ROS_DISTRO}"  \
+        --rosdistro "${P3D_ROS_DISTRO}"  \
         -y \
-    && colcon version-check
+    && colcon version-check \
+    || exit 1
+
 
 # Note: The colcon flag "--cmake-clean-cache" reset the python3 env
 COLCON_FLAGS=()
@@ -534,14 +555,13 @@ COLCON_FLAGS+=(--symlink-install)
 #COLCON_FLAGS+=(--executor sequential) # alternative if symlink install is unstable
 COLCON_FLAGS+=(
       "--cmake-clean-cache"
-      "--cmake-args" "-DCMAKE_BUILD_TYPE=Release"
-#      "--cmake-args" "-DCMAKE_PREFIX_PATH=${PERCEPT_LIBRARIES_PATH:?err}:${CMAKE_PREFIX_PATH}"
+      "--cmake-args" "-DCMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}"
       "--event-handlers" "console_direct+"
    )
-echo -e "COLCON_FLAGS=( ${COLCON_FLAGS[*]} )"
-colcon build "${COLCON_FLAGS[@]}"
-
-# ///////////////////////////////////////////////////////////////// REFACTORING inprogress ///<--//
+echo && n2st::print_msg "Run colcon build ${COLCON_FLAGS[*]}" \
+    && cd "${P3D_ROS_DEV_WORKSPACE}" \
+    && colcon build "${COLCON_FLAGS[@]}" \
+    || exit 1
 
 # .... install Paraview ...........................................................................
 n2st::print_formated_script_header "Install Paraview" "."
@@ -555,6 +575,7 @@ apt-get update \
 # ....Fetch ros bag husky_short_demo.bag...........................................................
 n2st::print_formated_script_header "Fetch ros bag husky_short_demo.bag" "."
 
+# (CRITICAL) ToDo: update this link to the version refactored for ROS2
 cd "${P3D_USER_HOME}/percep3d_data"
 wget -O husky_short_demo.zip "http://norlab.s3.valeria.science/percep3d/husky_short_demo.zip?AWSAccessKeyId=XMBLP3A0338XN5LASKV2&Expires=2319980812&Signature=n5HiUTunG7tcTINJovxH%2FtnGbM4%3D"
 unzip husky_short_demo.zip
@@ -564,9 +585,7 @@ rm husky_short_demo.zip
 # ==== Final step =================================================================================
 n2st::print_formated_script_header "Finalize percep3d-software-install" "."
 
-# Make sure that you have your environment properly setup. A good way to check is to ensure that
-# environment variables like ROS_ROOT and ROS_PACKAGE_PATH are set:
-#   $ printenv | grep ROS
+# Make sure that you have your environment properly setup.
 printenv | grep ROS
 
 cd "${P3D_ROS_DEV_WORKSPACE}"

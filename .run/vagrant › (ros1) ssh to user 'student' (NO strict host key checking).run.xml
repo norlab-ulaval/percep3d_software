@@ -1,5 +1,5 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="vagrant › (ros1) ssh to user 'student' (NO strict host key checking)" type="ShConfigurationType">
+  <configuration default="false" name="vagrant › (ros1) ssh to user 'student' (NO strict host key checking)" type="ShConfigurationType" folderName="ros1">
     <option name="SCRIPT_TEXT" value="ssh -o StrictHostKeyChecking=no -p 22 student@132.203.26.126" />
     <option name="INDEPENDENT_SCRIPT_PATH" value="true" />
     <option name="SCRIPT_PATH" value="" />

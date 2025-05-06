@@ -57,11 +57,9 @@ Vagrant.configure("2") do |config|
 
     # Customize the amount of memory on the VM:
     prl.memory = 16048
-#     prl.cpus = 4
     prl.cpus = 8
 
-    # (CRITICAL) ToDo: Switch to false for release
-    prl.linked_clone = true
+    prl.linked_clone = false # (CRITICAL) ToDo: Switch to false for release
   end
 
   # ====Multimachine config================
@@ -86,43 +84,43 @@ Vagrant.configure("2") do |config|
   end
 
   # ====Provisioning========================
-  config.vm.provision "shell", inline: <<-SHELL
-    export DEBIAN_FRONTEND=noninteractive
-    apt-get update
-    apt-get install --assume-yes \
-        locales \
-        sudo \
-        apt-utils \
-        lsb-release \
-        ca-certificates \
-        software-properties-common \
-        build-essential \
-        bash-completion \
-        fontconfig \
-        vim \
-        tree \
-        git \
-        curl \
-        wget \
-        gnupg2 \
-        zip gzip tar unzip \
-        rsync \
-        net-tools \
-        dnsutils
+  $INLINE_SCRIP = <<-'SCRIPT'
 
-#     # (Priority) ToDo: assessment >> next bloc ↓↓
-#     apt-get install --assume-yes --no-install-recommends ubuntu-desktop
+  export DEBIAN_FRONTEND=noninteractive
+  apt-get update
+  apt-get install --assume-yes \
+      locales \
+      sudo \
+      apt-utils \
+      lsb-release \
+      ca-certificates \
+      software-properties-common \
+      build-essential \
+      bash-completion \
+      fontconfig \
+      vim \
+      tree \
+      git \
+      curl \
+      wget \
+      gnupg2 \
+      zip gzip tar unzip \
+      rsync \
+      net-tools \
+      dnsutils
 
-#     # (Priority) ToDo: assessment >> next bloc ↓↓
-#     locale-gen en_US en_US.UTF-8 && update-locale LC_ALL=en_US.UTF-8 LANG=en_US.UTF-8
+  echo "Set dev default landing path"
+  echo "cd /opt/percep3d_software/vm_software_install_ros1" >> /home/vagrant/.bashrc
 
-    # sudo reboot
+  apt-get install --assume-yes --no-install-recommends ubuntu-desktop
+  SCRIPT
 
-    # (Priority) ToDo: validate >> next bloc ↓↓
-    echo "Set default landing path"
-    echo "cd /opt/percep3d_software/vm_software_install_ros1" >> /home/vagrant/.bashrc
+  config.vm.provision :shell do |shell|
+    shell.inline = $INLINE_SCRIP
+    shell.privileged = true
+    shell.reboot = true
+  end
 
-  SHELL
 
   # Execute rsync from the host on 'vagrant up' trigger
   config.trigger.after :up do |trigger|

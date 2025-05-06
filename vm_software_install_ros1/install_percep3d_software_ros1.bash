@@ -23,7 +23,7 @@ set -e # Note: we want the installer to always fail-fast (it wont affect the bui
 
 
 # ....Hardcoded environment variable...............................................................
-ROS_PKG='desktop_full'
+ROS_PKG='desktop-full'
 P3D_USER='student'
 PASSWORD='percep3d'
 PERCEPT_LIBRARIES_PATH="/opt/percep3d_libraries"
@@ -37,6 +37,10 @@ SHOW_SPLASH_IDU="${SHOW_SPLASH_IDU:-false}"
 P3D_USER_HOME="/home/${P3D_USER}"
 P3D_ROS_DEV_WORKSPACE="${P3D_USER_HOME}/catkin_ws"
 
+# skip GUI dialog by setting everything to default
+export DEBIAN_FRONTEND=noninteractive
+
+
 # ....Project root logic...........................................................................
 TMP_CWD=$(pwd)
 P3DS_PATH=$(git rev-parse --show-toplevel)
@@ -49,7 +53,6 @@ N2ST_PATH=${N2ST_PATH:-"${P3DS_PATH}/utilities/norlab-shell-script-tools"}
 cd "${N2ST_PATH}" || exit 1
 source import_norlab_shell_script_tools_lib.bash
 
-# ====Begin========================================================================================
 
 # ....Setup timezone and localization..............................................................
 # change the locale from POSIX to UTF-8
@@ -59,12 +62,12 @@ apt-get update && \
       lsb-release \
   && rm -rf /var/lib/apt/lists/* \
   && locale-gen en_US en_US.UTF-8 \
-  && update-locale LC_ALL=en_US.UTF-8 LANG=en_US.UTF-8
+  && update-locale LC_ALL=en_US.UTF-8 LANG=en_US.UTF-8 \
+  && export LANG=en_US.UTF-8
 
 if [[ "${SHOW_SPLASH_IDU}" == 'true' ]]; then
   n2st::norlab_splash "Percep3D course software install" "https://github.com/norlab-ulaval/percep3d_software"
 fi
-
 n2st::print_formated_script_header "install_percep3d_software_ros1.bash"
 
 
@@ -81,8 +84,10 @@ else
   n2st::print_msg_error_and_exit "Ubuntu distro ${DISTRIB_RELEASE} not supported by the installer"
 fi
 P3D_ROS_ROOT="/opt/ros/${ROS_DISTRO}"
-echo "Ubuntu version is ${DISTRIB_RELEASE}, will install ROS1 distro ${ROS_DISTRO} at ${P3D_ROS_ROOT}"
+n2st::print_msg "Ubuntu version is ${DISTRIB_RELEASE}, will install ROS1 distro ${ROS_DISTRO} at ${P3D_ROS_ROOT}"
 
+
+# ====Begin========================================================================================
 
 # ... Add new user ................................................................................
 n2st::print_formated_script_header "Add new user" "."
@@ -130,13 +135,8 @@ rm beginner_tutorials.zip
 rm percep3d_mapping.zip
 
 
-
-
 # ==== Install tools ==============================================================================
 n2st::print_formated_script_header "Install tools" "."
-
-# skip GUI dialog by setting everything to default
-export DEBIAN_FRONTEND=noninteractive
 
 # ... install development utilities ...............................................................
 apt-get update \
@@ -157,7 +157,6 @@ apt-get update \
     && rm -rf /var/lib/apt/lists/*
 
 
-
 # .... hardware acceleration in VM ................................................................
 apt-get update \
     && apt-get install --assume-yes \
@@ -171,10 +170,7 @@ apt-get update \
 )  >> ${P3D_USER_HOME}/.bashrc
 
 
-
 # ===Service: ssh server===========================================================================
-
-
 n2st::print_formated_script_header "ssh daemon setup" "."
 
 if [[ ${SETUP_SSH_DAEMON} == true ]]; then
@@ -410,8 +406,8 @@ source "${P3D_ROS_ROOT}/setup.bash"
 catkin_make
 source "${P3D_ROS_DEV_WORKSPACE}/devel/setup.bash"
 
-echo "source ${P3D_ROS_ROOT}/setup.bash" >> ~/.bashrc
-echo "source ${P3D_ROS_DEV_WORKSPACE}/devel/setup.bash" >> ~/.bashrc
+echo "source ${P3D_ROS_ROOT}/setup.bash" >> "${HOME}/.bashrc"
+echo "source ${P3D_ROS_DEV_WORKSPACE}/devel/setup.bash" >> "${HOME}/.bashrc"
 echo "source ${P3D_ROS_ROOT}/setup.bash" >> "${P3D_USER_HOME}/.bashrc"
 echo "source ${P3D_ROS_DEV_WORKSPACE}/devel/setup.bash" >> "${P3D_USER_HOME}/.bashrc"
 
@@ -422,14 +418,16 @@ echo "sourcing ${P3D_ROS_ROOT}/setup.bash" \
   && source "${P3D_ROS_ROOT}"/setup.bash \
   && echo "sourcing ${P3D_ROS_DEV_WORKSPACE}/devel/setup.bash" \
   && source "${P3D_ROS_DEV_WORKSPACE}"/devel/setup.bash \
+  && echo "" \
   && echo ROS_VERSION="${ROS_VERSION:?'Build argument needs to be set and non-empty.'}" \
   && echo ROS_PYTHON_VERSION="${ROS_PYTHON_VERSION:?'Build argument needs to be set and non-empty.'}" \
   && echo ROS_DISTRO="${ROS_DISTRO:?'Build argument needs to be set and non-empty.'}" \
   && echo PATH="${PATH}" \
   && echo PYTHONPATH="${PYTHONPATH:?'Build argument needs to be set and non-empty.'}" \
   && echo CMAKE_PREFIX_PATH="${CMAKE_PREFIX_PATH:?'Build argument needs to be set and non-empty.'}" \
+  && echo "" \
   && python -c "import rospy" \
-  && [[ "$(rosversion --distro)" == "${ROS_DISTRO}" ]] \
+  && [[ "$(rosversion --distro)" == "${P3D_ROS_DISTRO}" ]] \
   || exit 1
 
 echo "Check workspace directory installation"  \
@@ -437,8 +435,8 @@ echo "Check workspace directory installation"  \
     && [[ -d ${P3D_ROS_DEV_WORKSPACE}/devel ]] \
     || exit 1
 
-# . . Pull required repository. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-n2st::print_formated_script_header "Pull ROS required repository" "."
+# . . Pull percep3d ROS1 required repository. . . . . . . . . . . . . . . . . . . . . . . . . . . .
+n2st::print_formated_script_header "Pull percep3d ROS1 required repository" "."
 
 cd "${P3D_ROS_DEV_WORKSPACE}/src/"
 git clone https://github.com/norlab-ulaval/libpointmatcher_ros.git
@@ -456,28 +454,25 @@ cd "${P3D_ROS_DEV_WORKSPACE}/src/"
 git clone https://github.com/norlab-ulaval/percep3d_turtle_exercises.git
 
 
-# . . Install ROS & build catkin workspace. . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-n2st::print_formated_script_header "Install ROS required repository" "."
+# . . Buildl percep3d ROS1 . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . ..
+n2st::print_formated_script_header "Buildl percep3d ROS1 required repository" "."
 cd "${P3D_ROS_DEV_WORKSPACE}"
 
-apt-get update --fix-missing
 source "${P3D_ROS_ROOT}/setup.bash"
 source "${P3D_ROS_DEV_WORKSPACE}/devel/setup.bash"
-
-# (Priority) ToDo:validate >> next bloc
 export CMAKE_PREFIX_PATH="${PERCEPT_LIBRARIES_PATH:?err}:${CMAKE_PREFIX_PATH}"
-echo "export CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}" >> ~/.bashrc
-echo "export CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}" >> "${P3D_USER_HOME}/.bashrc"
 
+apt-get update --fix-missing
 catkin_make
 
+# . . Install required dependencies for tutorial. . . . . . . . . . . . . . . . . . . . . . . . .
 # Required dependencies for tutorial: Introduction to tf https://wiki.ros.org/tf/Tutorials/Introduction%20to%20tf
 # Note: tf is deprecated in favor of tf2 ››› Install tf2 for tutorial in exo module 2.4
 apt-get update \
     && apt-get install --assume-yes \
-          ros-"${ROS_DISTRO}"-turtle-tf2 \
-          ros-"${ROS_DISTRO}"-tf2-tools \
-          ros-"${ROS_DISTRO}"-tf \
+          ros-"${P3D_ROS_DISTRO}"-turtle-tf2 \
+          ros-"${P3D_ROS_DISTRO}"-tf2-tools \
+          ros-"${P3D_ROS_DISTRO}"-tf \
     && rm -rf /var/lib/apt/lists/*
 
 

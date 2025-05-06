@@ -1,5 +1,5 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="vagrant › (ros1) ssh to user 'vagrant'" type="ShConfigurationType">
+  <configuration default="false" name="vagrant › (ros1) ssh to user 'vagrant'" type="ShConfigurationType" folderName="ros1">
     <option name="SCRIPT_TEXT" value="vagrant ssh" />
     <option name="INDEPENDENT_SCRIPT_PATH" value="true" />
     <option name="SCRIPT_PATH" value="" />

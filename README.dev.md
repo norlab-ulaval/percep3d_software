@@ -11,36 +11,63 @@ The `Vagrantfile` at repository root is custom-made with the following configura
 - the VM is provisioned with all the necessary developement tools
 
 ### Initial setup
-1. Install [Vagrant](https://www.vagrantup.com) 
-2. Install a provider ([parallels desktop + Vagrant](http://parallels.github.io/vagrant-parallels/docs/) on Mac OsX). Dont forget to modify the `Vagrantfile` accordingly if you use a different provider.
+1. Install [Vagrant](https://www.vagrantup.com). Run `vagrant --help` to check available command. 
+2. Install a provider. Dont forget to modify the `Vagrantfile` accordingly to your choosen provider.
+   - [parallels desktop + Vagrant](http://parallels.github.io/vagrant-parallels/docs/) on Mac OsX 
+   - [VirtualBox](https://developer.hashicorp.com/vagrant/docs/providers/virtualbox)
+   - [VMware](https://developer.hashicorp.com/vagrant/docs/providers/vmware)
+   - [Docker](https://developer.hashicorp.com/vagrant/docs/providers/docker)
 
 ### To start the virtual machine
 ```bash
-# execute in root
+# Example for the ROS2 vm
+$ cd path/to/percep3d_software/vm_software_install_ros2/
+
+# Be sure to always run vagrant command from the directory where the Vagrantfile is.
 $ vagrant up
+```
+Note: `vagrant up` is configured to automaticaly rsync the vm content
+
+### To `ssh` the virtual machine
+```bash
 $ vagrant ssh
-$ cd /opt/percep3d_software
+# vagrant@percep3d:~$
+
+$ cd /opt/percep3d_software/vm_software_install_ros2
+# vagrant@percep3d:/opt/percep3d_software/vm_software_install_ros2$
+
+$ sudo bash install_percep3d_software_ros2.bash
 # ... et voila
 ```
-Note: `vagrant ssh` will log in the VM default username `vagrant`. To directly log with the TeamCity Server admin username once its created simply use ssh:  
+#### Note: 
+- The VM hostname is `percep3d`
+- The VM is configured with a static IP address: `132.203.26.125`
+- `vagrant ssh` will login the VM box default user `vagrant`
+ 
+#### To login with the percep3d course script created new user `student`:  
 ```bash
-$ ssh -o StrictHostKeyChecking=no $ADMIN_USER@$SERVER_IP
-
 $ ssh -o StrictHostKeyChecking=no student@132.203.26.125
+# -o StrictHostKeyChecking=no is a trick to enable using the same IP address as the real server and
 ```
-`-o StrictHostKeyChecking=no` is a trick to enable using the same IP address as the real server and
 
 
 ### To save a snapshot in time
 ```bash
-$ vagrant snapshot save --force myCoolSnashotName
-$ vagrant snapshot restore myCoolSnashotName
+# To save a VM state in time
+$ vagrant snapshot save --force <myCoolSnashotName>
+
+# To restore a saved snapshot
+$ vagrant snapshot restore <myCoolSnashotName>
 ```
+Note: `vagrant snapshot restore` is configured to automaticaly rsync the vm content
 
 ### To update your VM
 ```bash
 # To manually sync your local repository codebase to the virtual machine (unidirectional sync)
 $ vagrant rsync
+
+# To update your Vagrantfile definition in the VM
+$ vagrant provision  
 
 # To update your Vagrantfile definition in the VM
 $ vagrant reload
@@ -51,15 +78,43 @@ $ vagrant reload
 # To stop the VM
 $ vagrant halt
 
-# or remove your VM
-$ vagrant destroy
+# or remove your VM and check vm status
+$ sudo vagrant destroy --force && vagrant global-status --prune
 ```
 
 
-# Unit-test execution step on aarch arm64 (Apple M1 chips): 
+# Unit-test execution step 
+## ROS1 vm:
 ```shell
-docker pull --platform linux/arm64 ubuntu:20.04
-docker build --platform linux/arm64 -f Dockerfile.test -t percep3d-vm-software-tester-ros1-ubuntu:20.04 . 
-docker run -a --name IAmPercep3D -t -i percep3d-vm-software-tester-ros1-ubuntu:20.04 
+docker pull ubuntu:20.04 \
+  && docker build \
+        --build-arg BASE_IMAGE=ubuntu:20.04 \ 
+        -f vm_software_install_ros1/Dockerfile.test \ 
+        -t perce3d-software-ros1:noetic-full-ubuntu-20.04 \ 
+        . \ 
+  && docker run --name IamPercep3D-Noetic -t -i perce3d-software-ros1:noetic-full-ubuntu-20.04 
 ```
 
+## ROS1 vm on aarch arm64 (Apple M1 chips):
+```shell
+docker pull --platform linux/arm64 ubuntu:20.04 \
+  && docker build \
+        --build-arg BASE_IMAGE=ubuntu:20.04 \ 
+        --platform linux/arm64 \ 
+        -f vm_software_install_ros1/Dockerfile.test \ 
+        -t perce3d-software-ros1:noetic-full-ubuntu-20.04 \ 
+        . \ 
+  && docker run --name IamPercep3D-Noetic -t -i perce3d-software-ros1:noetic-full-ubuntu-20.04 
+```
+
+## ROS2 on aarch arm64 (Apple M1 chips):
+```shell
+docker pull --platform linux/arm64 ubuntu:20.04 \
+  && docker build \
+        --build-arg BASE_IMAGE=ubuntu:22.04 \
+        --platform linux/arm64 \
+        -f vm_software_install_ros2/Dockerfile.test \
+        -t perce3d-software-ros2:humble-full-ubuntu-22.04 \
+        . \
+  && docker run --name IamPercep3D-Humble -t -i perce3d-software-ros2:humble-full-ubuntu-22.04 
+```

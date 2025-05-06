@@ -1,5 +1,5 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="(Noetic) vm_software_install_ros1/Dockerfile.test" type="docker-deploy" factoryName="dockerfile" server-name="Docker from MacBook">
+  <configuration default="false" name="(Melodic) vm_software_install_ros1/Dockerfile.test" type="docker-deploy" factoryName="dockerfile" folderName="ros1" server-name="Docker from MacBook">
     <deployment type="dockerfile">
       <settings>
         <option name="imageTag" value="perce3d-software:melodic-full-ubuntu-18.04" />
@@ -7,19 +7,16 @@
           <list>
             <DockerEnvVarImpl>
               <option name="name" value="BASE_IMAGE" />
-              <option name="value" value="ubuntu:20.04" />
-            </DockerEnvVarImpl>
-            <DockerEnvVarImpl>
-              <option name="name" value="ROS_DISTRO" />
-              <option name="value" value="noetic" />
+              <option name="value" value="ubuntu:18.04" />
             </DockerEnvVarImpl>
           </list>
         </option>
         <option name="buildCliOptions" value="--platform linux/arm64" />
-        <option name="containerName" value="IamPercep3D-Noetic" />
+        <option name="containerName" value="IamPercep3D-Melodic" />
+        <option name="contextFolderPath" value="." />
         <option name="commandLineOptions" value="-it" />
         <option name="showCommandPreview" value="true" />
-        <option name="sourceFilePath" value="../percep3d_software/vm_software_install_ros1/Dockerfile.test" />
+        <option name="sourceFilePath" value="vm_software_install_ros1/Dockerfile.test" />
       </settings>
     </deployment>
     <method v="2" />
