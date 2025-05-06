@@ -107,9 +107,20 @@ docker pull --platform linux/arm64 ubuntu:20.04 \
   && docker run --name IamPercep3D-Noetic -t -i perce3d-software-ros1:noetic-full-ubuntu-20.04 
 ```
 
+## ROS2 vm:
+```shell
+docker pull ubuntu:22.04 \
+  && docker build \
+        --build-arg BASE_IMAGE=ubuntu:22.04 \
+        -f vm_software_install_ros2/Dockerfile.test \
+        -t perce3d-software-ros2:humble-full-ubuntu-22.04 \
+        . \
+  && docker run --name IamPercep3D-Humble -t -i perce3d-software-ros2:humble-full-ubuntu-22.04 
+```
+
 ## ROS2 on aarch arm64 (Apple M1 chips):
 ```shell
-docker pull --platform linux/arm64 ubuntu:20.04 \
+docker pull --platform linux/arm64 ubuntu:22.04 \
   && docker build \
         --build-arg BASE_IMAGE=ubuntu:22.04 \
         --platform linux/arm64 \
@@ -118,3 +129,4 @@ docker pull --platform linux/arm64 ubuntu:20.04 \
         . \
   && docker run --name IamPercep3D-Humble -t -i perce3d-software-ros2:humble-full-ubuntu-22.04 
 ```
+
