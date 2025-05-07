@@ -21,7 +21,7 @@ The `Vagrantfile` at repository root is custom-made with the following configura
 ### To start the virtual machine
 ```bash
 # Example for the ROS2 vm
-$ cd path/to/percep3d_software/vm_software_install_ros2/
+$ cd path/to/percep3d_software/src/vm_software_install_ros2/
 
 # Be sure to always run vagrant command from the directory where the Vagrantfile is.
 $ vagrant up
@@ -33,8 +33,8 @@ Note: `vagrant up` is configured to automaticaly rsync the vm content
 $ vagrant ssh
 # vagrant@percep3d:~$
 
-$ cd /opt/percep3d_software/vm_software_install_ros2
-# vagrant@percep3d:/opt/percep3d_software/vm_software_install_ros2$
+$ cd /opt/percep3d_software/src/vm_software_install_ros2
+# vagrant@percep3d:/opt/percep3d_software/src/vm_software_install_ros2$
 
 $ sudo bash install_percep3d_software_ros2.bash
 # ... et voila
@@ -93,7 +93,7 @@ $ sudo vagrant destroy --force && vagrant global-status --prune
 docker pull ubuntu:20.04
 docker build \
         --build-arg BASE_IMAGE=ubuntu:20.04 \
-        -f vm_software_install_ros1/Dockerfile.test \
+        -f src/vm_software_install_ros1/Dockerfile.test \
         -t perce3d-software-ros1:noetic-full-ubuntu-20.04 \
         . 
 docker run --name IamPercep3D-Noetic --rm -it perce3d-software-ros1:noetic-full-ubuntu-20.04 
@@ -104,7 +104,7 @@ docker run --name IamPercep3D-Noetic --rm -it perce3d-software-ros1:noetic-full-
 docker pull ubuntu:22.04
 docker build \
         --build-arg BASE_IMAGE=ubuntu:22.04 \
-        -f vm_software_install_ros2/Dockerfile.test \
+        -f src/vm_software_install_ros2/Dockerfile.test \
         -t perce3d-software-ros2:humble-full-ubuntu-22.04 \
         .
 docker run --name IamPercep3D-Humble --rm -it perce3d-software-ros2:humble-full-ubuntu-22.04 
@@ -118,7 +118,7 @@ docker pull --platform linux/arm64 ubuntu:20.04
 docker build \
         --build-arg BASE_IMAGE=ubuntu:20.04 \
         --platform linux/arm64 \
-        -f vm_software_install_ros1/Dockerfile.test \
+        -f src/vm_software_install_ros1/Dockerfile.test \
         -t perce3d-software-ros1:noetic-full-ubuntu-20.04 \
         . 
 docker run --name IamPercep3D-Noetic --rm -it perce3d-software-ros1:noetic-full-ubuntu-20.04 
@@ -131,7 +131,7 @@ docker pull --platform linux/arm64 ubuntu:22.04
 docker build \
         --build-arg BASE_IMAGE=ubuntu:22.04 \
         --platform linux/arm64 \
-        -f vm_software_install_ros2/Dockerfile.test \
+        -f src/vm_software_install_ros2/Dockerfile.test \
         -t perce3d-software-ros2:humble-full-ubuntu-22.04 \
         .
 docker run --name IamPercep3D-Humble --rm -it perce3d-software-ros2:humble-full-ubuntu-22.04 

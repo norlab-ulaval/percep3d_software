@@ -1,4 +1,4 @@
-ARG BASE_IMAGE=ubuntu:20.04
+ARG BASE_IMAGE=ubuntu:22.04
 FROM ${BASE_IMAGE} AS base-image
 
 LABEL org.opencontainers.image.authors="luc.coupal.1@ulaval.ca"
@@ -9,7 +9,7 @@ ENV TERM=${TERM:-"xterm-256color"}
 
 ARG DOCKER_USER=docker
 
-SHELL ["/bin/bash", "-c"]
+SHELL ["/bin/bash", "-e", "-c"]
 
 # install development utilities
 RUN apt-get update \
@@ -47,15 +47,16 @@ EOF
 
 USER "${DOCKER_USER}"
 
-COPY vm_software_install_ros1 "/vm_software_install_ros1"
+COPY src/vm_software_install_ros2 "/src/vm_software_install_ros2"
 COPY utilities "/utilities"
 COPY .git "/.git"
 
-WORKDIR vm_software_install_ros1
-RUN sudo chmod +x install_percep3d_software_ros1.bash
+WORKDIR src/vm_software_install_ros2
+RUN sudo chmod +x install_percep3d_software_ros2.bash
 
 # Note: Switch to the run command version for multiarch testing
-RUN sudo bash install_percep3d_software_ros1.bash
-#ENTRYPOINT [ "sudo", "bash", "install_percep3d_software_ros1.bash" ]
+RUN sudo bash install_percep3d_software_ros2.bash
+#ENTRYPOINT [ "sudo", "bash", "install_percep3d_software_ros2.bash" ]
 
-CMD [ "echo", "-e", "✅  Testing install_percep3d_software_ros1.bash completed with SUCCESS" ]
+CMD [ "bash" ]
+

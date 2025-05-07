@@ -1,15 +1,15 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="vagrant › (ros1) execute rsync " type="ShConfigurationType" folderName="[P3SC] B | vagrant ros1">
-    <option name="SCRIPT_TEXT" value="vagrant rsync" />
+  <configuration default="false" name="bash test_install_percep3d_software_ros1.bash" type="ShConfigurationType" folderName="[P3SC] A | Unit-test">
+    <option name="SCRIPT_TEXT" value="bash tests/test_install_percep3d_software_ros1.bash" />
     <option name="INDEPENDENT_SCRIPT_PATH" value="true" />
     <option name="SCRIPT_PATH" value="" />
     <option name="SCRIPT_OPTIONS" value="" />
     <option name="INDEPENDENT_SCRIPT_WORKING_DIRECTORY" value="true" />
-    <option name="SCRIPT_WORKING_DIRECTORY" value="$PROJECT_DIR$/src/vm_software_install_ros1" />
+    <option name="SCRIPT_WORKING_DIRECTORY" value="$PROJECT_DIR$/" />
     <option name="INDEPENDENT_INTERPRETER_PATH" value="true" />
     <option name="INTERPRETER_PATH" value="/bin/zsh" />
     <option name="INTERPRETER_OPTIONS" value="" />
-    <option name="EXECUTE_IN_TERMINAL" value="false" />
+    <option name="EXECUTE_IN_TERMINAL" value="true" />
     <option name="EXECUTE_SCRIPT_FILE" value="false" />
     <envs />
     <method v="2" />

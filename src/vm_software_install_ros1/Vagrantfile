@@ -4,8 +4,8 @@
 ENV["LC_ALL"] = "en_US.UTF-8"
 
 ## Set which virtual box
-UBUNTU_BOX = "bento/ubuntu-22.04" # https://portal.cloud.hashicorp.com/vagrant/discover/bento/ubuntu-22.04
-#UBUNTU_BOX = "bento/ubuntu-24.04"
+#UBUNTU_BOX = "bento/ubuntu-20.04"
+UBUNTU_BOX = "bento/ubuntu-20.04-arm64"
 
 Vagrant.configure("2") do |config|
   # The most common configuration options are documented and commented below.
@@ -29,7 +29,7 @@ Vagrant.configure("2") do |config|
     # owner: "percep3d",
     # group: "percep3d",
 #     rsync__exclude: [".git", ".vagrant", ".idea", ".DS_Store"],
-    rsync__exclude: [".vagrant", ".idea", ".DS_Store", "vm_software_install_ros1"],
+    rsync__exclude: [".vagrant", ".idea", ".DS_Store", "vm_software_install_ros2"],
     automount: true,
     rsync__verbose: false,
     rsync__auto: true
@@ -59,8 +59,7 @@ Vagrant.configure("2") do |config|
     prl.memory = 16048
     prl.cpus = 8
 
-    # (CRITICAL) ToDo: Switch to false for release
-    prl.linked_clone = false
+    prl.linked_clone = false # (CRITICAL) ToDo: Switch to false for release
   end
 
   # ====Multimachine config================
@@ -69,7 +68,7 @@ Vagrant.configure("2") do |config|
   #     - port 80 (mapped to host 8080) is for docker internet access, e.g. executin apt-get update inside docker container
   #     - port 2222 is for accessing the VM ssh server for Remote Developement setup
 
-  config.vm.define "percep3d-vm-ros2", primary: true do |tcserver|
+  config.vm.define "percep3d-vm-ros1", primary: true do |tcserver|
     tcserver.vm.box = UBUNTU_BOX
     tcserver.vm.hostname = "percep3d"
     tcserver.vm.network "private_network", ip: "132.203.26.126"
@@ -85,19 +84,7 @@ Vagrant.configure("2") do |config|
   end
 
   # ====Provisioning========================
-  $INLINE_SCRIPT = <<-'SCRIPT'
-
-  ( \
-      echo "# =====Quick-hack: Override needrestart configuration====="; \
-      echo "# needrestart: checks which daemons need to be restarted after library upgrades"; \
-      echo "# i.e. the pink famous console screen"; \
-      echo "# ref: https://manpages.ubuntu.com/manpages/focal/man1/needrestart.1.html"; \
-      echo "# - a=>automatic"; \
-      echo "# - l=>list only"; \
-      echo "# - i=>interactive"; \
-      echo "\$nrconf{restart} = 'a';"; \
-      echo ""; \
-  ) | tee /etc/needrestart/conf.d/no-prompt.conf
+  $INLINE_SCRIP = <<-'SCRIPT'
 
   export DEBIAN_FRONTEND=noninteractive
   apt-get update
@@ -123,20 +110,21 @@ Vagrant.configure("2") do |config|
       dnsutils
 
   echo "Set dev default landing path"
-  echo "cd /opt/percep3d_software/vm_software_install_ros2" >> /home/vagrant/.bashrc
+  echo "cd /opt/percep3d_software/src/vm_software_install_ros1" >> /home/vagrant/.bashrc
 
   apt-get install --assume-yes --no-install-recommends ubuntu-desktop
   SCRIPT
 
   config.vm.provision :shell do |shell|
-    shell.inline = $INLINE_SCRIPT
+    shell.inline = $INLINE_SCRIP
     shell.privileged = true
     shell.reboot = true
   end
 
+
   # Execute rsync from the host on 'vagrant up' trigger
   config.trigger.after :up do |trigger|
-     trigger.only_on = "percep3d-vm-ros2"
+     trigger.only_on = "percep3d-vm-ros1"
      trigger.name = "rsync cmd"
      trigger.info = "Executing 'vagrant rsync' now"
      trigger.run = {inline: "bash -c 'vagrant rsync'"}
@@ -145,7 +133,7 @@ Vagrant.configure("2") do |config|
 
   # Execute rsync from the host on 'vagrant snapshot' trigger
   config.trigger.after :snapshot_restore, type: :action do |trigger|
-     trigger.only_on = "percep3d-vm-ros2"
+     trigger.only_on = "percep3d-vm-ros1"
      trigger.name = "rsync cmd on 'vagrant snapshot restore'"
      trigger.info = "Executing 'vagrant rsync' now"
      trigger.run = {inline: "bash -c 'vagrant rsync'"}
@@ -153,7 +141,7 @@ Vagrant.configure("2") do |config|
   end
 
   config.trigger.after :up do |trigger|
-    trigger.only_on = "percep3d-vm-ros2"
+    trigger.only_on = "percep3d-vm-ros1"
     trigger.name = "Dir sync info"
     trigger.info = "\033[1;33m Remember to use the command \033[1;2mvagrant rsync\033[0m\033[1;33m to execute a one time sync of the \033[1;2mpercep3d_software\033[0m\033[1;33m directory with all guess VM or use the command \033[1;2mvagrant rsync-auto\033[0m\033[1;33m to start file watching and sync automaticaly on changes. Alternatively, enable \033[1;2mvagrant-gatling-rsync\033[0m\033[1;33m in the Vagrantfile.\033[0m"
   end

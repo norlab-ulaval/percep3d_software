@@ -132,13 +132,13 @@ One of the following ubuntu distro:
        ```shell
        sudo apt-get update && sudo apt-get install --assume-yes git \
          && cd /opt && sudo git clone --recurse-submodules https://github.com/norlab-ulaval/percep3d_software.git \
-         && cd percep3d_software/vm_software_install_ros1 && sudo bash install_percep3d_software_ros1.bash
+         && cd percep3d_software/src/vm_software_install_ros1 && sudo bash install_percep3d_software_ros1.bash
        ```
    - For installing the ROS2 version:  
         ```shell
         sudo apt-get update && sudo apt-get install --assume-yes git \
           && cd /opt && sudo git clone --recurse-submodules https://github.com/norlab-ulaval/percep3d_software.git \
-          && cd percep3d_software/vm_software_install_ros2 && sudo bash install_percep3d_software_ros2.bash
+          && cd percep3d_software/src/vm_software_install_ros2 && sudo bash install_percep3d_software_ros2.bash
         ```
 3. Wait for the install script execution end. You will see console message: `Completed install_percep3d_software_ros*.bash`  
 4. Logout the current user and login with the new user `student` (password `percep3d`)

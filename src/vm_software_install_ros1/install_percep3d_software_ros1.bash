@@ -9,7 +9,7 @@
 #       $ sudo apt-get update && sudo apt-get install --assume-yes git
 #       $ cd /opt
 #       $ sudo git clone --recurse-submodules https://github.com/norlab-ulaval/percep3d_software.git
-#       $ cd percep3d_software/vm_software_install_ros1
+#       $ cd percep3d_software/src/vm_software_install_ros1
 #       $ sudo bash install_percep3d_software_ros1.bash
 #   2. Logout current user and login with user `student` pass `percep3d`
 #
@@ -24,8 +24,7 @@ P3D_USER='student'
 PASSWORD='percep3d'
 PERCEPT_LIBRARIES_PATH="/opt/percep3d_libraries"
 
-SETUP_SSH_DAEMON=false
-SETUP_SSH_DAEMON=${SETUP_SSH_DAEMON:-true} # Skip ssh daemon setup if set to false
+SETUP_SSH_DAEMON=${SETUP_SSH_DAEMON:-false} # Skip ssh daemon setup if set to false
 VAGRANT_SSH_PORT=22
 
 SHOW_SPLASH_IDU="${SHOW_SPLASH_IDU:-false}"
@@ -120,7 +119,7 @@ apt-get update \
         zip gzip tar unzip \
     && rm -rf /var/lib/apt/lists/*
 
-cd "${P3DS_PATH}/vm_software_install_ros1" || exit 1
+cd "${P3DS_PATH}/src/vm_software_install_ros1" || exit 1
 cp "./beginner_tutorials.zip" "${P3D_ROS_DEV_WORKSPACE}/src"
 cp "./percep3d_mapping.zip" "${P3D_ROS_DEV_WORKSPACE}/src"
 
