@@ -27,7 +27,6 @@
     &nbsp;
 </sup>
 <br>
-<br>
 
 [//]: # ( ==== Description =========================================== )
 **Software installation scripts and instructions for the Perception 3D robotics perception course**
@@ -38,13 +37,10 @@ software environment for the Percep3D course. It supports both ROS1 and ROS2 ins
 machines, including all necessary dependencies and configurations for robotics perception exercises.
 
 
-<br>
-
 [//]: # ( ==== Badges ================================================ ) 
 
 [![semantic-release: conventional commits](https://img.shields.io/badge/semantic--release-conventional_commits-453032?logo=semantic-release)](https://github.com/semantic-release/semantic-release)
 <img alt="GitHub release (with filter)" src="https://img.shields.io/github/v/release/norlab-ulaval/percep3d_software">
-
 
 [//]: # (NorLab teamcity)
 [//]: # (TODO: Un-comment the next line if your repository has run configuration enable on the norlab-teamcity-server)
@@ -56,13 +52,9 @@ machines, including all necessary dependencies and configurations for robotics p
 [//]: # (<a href="https://hub.docker.com/repository/docker/norlabulaval/libpointmatcher/"> <img alt="Docker Image Version &#40;latest semver&#41;" src="https://img.shields.io/docker/v/norlabulaval/libpointmatcher?logo=docker"> </a>)
 
 
-<br>
-
 [//]: # ( ==== Maintainer ============================================ ) 
 <sub>
 Maintainer <a href="https://redleader962.github.io">Luc Coupal</a>
-&nbsp; • &nbsp;
-luc.coupal.1@ulaval.ca
 </sub>
 
 <br>
@@ -70,10 +62,6 @@ luc.coupal.1@ulaval.ca
 </div>
 
 [//]: # ( ==== Body ================================================== ) 
-
-
-
----
 
 
 **Table of content**
