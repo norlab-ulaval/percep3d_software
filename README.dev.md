@@ -2,6 +2,17 @@
 
 ---
 
+## Unit-test execution
+```shell
+# Unit-test ros1 installer
+bash tests/test_install_percep3d_software_ros1.bash
+
+# Unit-test ros2 installer
+bash tests/test_install_percep3d_software_ros2.bash
+```
+
+---
+
 ## Development workflow in virtual machine (VM) with _Vagrant_ 
 
 The `Vagrantfile` at repository root is custom-made with the following configuration
@@ -83,10 +94,11 @@ $ sudo vagrant destroy --force && vagrant global-status --prune
 ```
 
 
-# Unit-test execution step 
+
+## Development in docker container  
 **Note**: execute command from repository root
 
-## Host aarch
+### Host aarch
 
 #### ROS1 vm:
 ```shell
@@ -96,10 +108,10 @@ docker build \
         -f src/vm_software_install_ros1/Dockerfile.test \
         -t perce3d-software-ros1:noetic-full-ubuntu-20.04 \
         . 
-docker run --name IamPercep3D-Noetic --rm -it perce3d-software-ros1:noetic-full-ubuntu-20.04 
+docker run --name IamPercep3D-Noetic --init --rm -it perce3d-software-ros1:noetic-full-ubuntu-20.04 
 ```
 
-#### ROS2 vm:
+#### ROS2 vm
 ```shell
 docker pull ubuntu:22.04
 docker build \
@@ -107,12 +119,12 @@ docker build \
         -f src/vm_software_install_ros2/Dockerfile.test \
         -t perce3d-software-ros2:humble-full-ubuntu-22.04 \
         .
-docker run --name IamPercep3D-Humble --rm -it perce3d-software-ros2:humble-full-ubuntu-22.04 
+docker run --name IamPercep3D-Humble --init --rm -it perce3d-software-ros2:humble-full-ubuntu-22.04 
 ```
 
-## arm64 specific (e.g. Apple M1 chips)
+### arm64 specific (e.g. Apple M1 chips)
 
-#### ROS1 vm:
+#### ROS1 vm
 ```shell
 docker pull --platform linux/arm64 ubuntu:20.04
 docker build \
@@ -121,11 +133,11 @@ docker build \
         -f src/vm_software_install_ros1/Dockerfile.test \
         -t perce3d-software-ros1:noetic-full-ubuntu-20.04 \
         . 
-docker run --name IamPercep3D-Noetic --rm -it perce3d-software-ros1:noetic-full-ubuntu-20.04 
+docker run --name IamPercep3D-Noetic --init --rm -it perce3d-software-ros1:noetic-full-ubuntu-20.04 
 ```
 
 
-#### ROS2 vm:
+#### ROS2 vm
 ```shell
 docker pull --platform linux/arm64 ubuntu:22.04
 docker build \
@@ -134,6 +146,6 @@ docker build \
         -f src/vm_software_install_ros2/Dockerfile.test \
         -t perce3d-software-ros2:humble-full-ubuntu-22.04 \
         .
-docker run --name IamPercep3D-Humble --rm -it perce3d-software-ros2:humble-full-ubuntu-22.04 
+docker run --name IamPercep3D-Humble --init --rm -it perce3d-software-ros2:humble-full-ubuntu-22.04 
 ```
 
