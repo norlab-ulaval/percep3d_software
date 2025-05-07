@@ -1,6 +1,6 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="run both ros1 and ros2 installer test scripts" type="ShConfigurationType" folderName="[P3SC] A | Unit-test">
-    <option name="SCRIPT_TEXT" value="bash tests/test_install_percep3d_software_ros1.bash &amp;&amp; bash tests/test_install_percep3d_software_ros2.bash" />
+    <option name="SCRIPT_TEXT" value="bash tests/test_install_percep3d_software_ros1.bash &amp;&amp; echo &amp;&amp; bash tests/test_install_percep3d_software_ros2.bash" />
     <option name="INDEPENDENT_SCRIPT_PATH" value="true" />
     <option name="SCRIPT_PATH" value="" />
     <option name="SCRIPT_OPTIONS" value="" />

@@ -24,12 +24,11 @@ Vagrant.configure("2") do |config|
   # config.vm.network "forwarded_port", guest: 80, host: 8080, host_ip: "127.0.0.1"
 
   # ====Shared folder======================
-  config.vm.synced_folder "..", "/opt/percep3d_software",
+  config.vm.synced_folder "../..", "/opt/percep3d_software",
     type: "rsync",
     # owner: "percep3d",
     # group: "percep3d",
-#     rsync__exclude: [".git", ".vagrant", ".idea", ".DS_Store"],
-    rsync__exclude: [".vagrant", ".idea", ".DS_Store", "vm_software_install_ros1"],
+    rsync__exclude: [".vagrant", ".idea", ".DS_Store", "src/vm_software_install_ros1"],
     automount: true,
     rsync__verbose: false,
     rsync__auto: true
@@ -59,8 +58,7 @@ Vagrant.configure("2") do |config|
     prl.memory = 16048
     prl.cpus = 8
 
-    # (CRITICAL) ToDo: Switch to false for release
-    prl.linked_clone = false
+    prl.linked_clone = true # (CRITICAL) ToDo: Switch to false for release (!)
   end
 
   # ====Multimachine config================
@@ -74,7 +72,7 @@ Vagrant.configure("2") do |config|
     tcserver.vm.hostname = "percep3d"
     tcserver.vm.network "private_network", ip: "132.203.26.126"
     config.vm.network "forwarded_port", guest: 80, host: 8080
-    # config.vm.network "forwarded_port", guest: 2222, host: 2222
+    config.vm.network "forwarded_port", guest: 2222, host: 2222
     # # tcserver.vm.network "forwarded_port", guest: 8111, host: 8111, guest_ip: "132.203.26.126"
     #
     tcserver.vm.provision "Check network", type: "shell", run: "always", inline: <<-SHELL

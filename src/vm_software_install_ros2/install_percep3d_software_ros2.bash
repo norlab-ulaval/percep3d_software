@@ -1,20 +1,29 @@
 #!/bin/bash -i
+DOCUMENTATION_INSTALL_PERCEP_3_D_SOFTWARE_ROS_1=$( cat <<'EOF'
 # =================================================================================================
 # Percep3D course software install (ROS2 version)
 #
-# Maintainer: luc.coupal.1@ulaval.ca
+# Usage:
+#   $ bash install_percep3d_software_ros2.bash [--help] [--install-ssh-daemon] [--no-splash]
 #
-# Script usage:
-#   1. In the VM, execute the following line in a terminal
-#       $ sudo apt-get update && sudo apt-get install --assume-yes git
-#       $ cd /opt
-#       $ sudo git clone --recurse-submodules https://github.com/norlab-ulaval/percep3d_software.git
-#       $ cd percep3d_software/src/vm_software_install_ros2
-#       $ sudo bash install_percep3d_software_ros2.bash
-#   2. logout current user and login with user `student` pass `percep3d`
+# Arguments:
+#   --install-ssh-daemon    Configure and start an ssh daemon on the vm for remote developement
+#   --no-splash             Skip the script splash screen
+#   -h | --help
 #
+# Note on VM script install steps:
+#   1. Spin a fresh VM using your prefered virtual machine provider
+#   2. Execute the install script with sudo
+#   3. Wait for the install script execution end.
+#      You will see console message: Completed install_percep3d_software_ros*.bash
+#   4. Logout the current user and login with the new user student (password percep3d)
+#   5. (optional) If you're using a server version .iso, just run the following line to install a GUI
+#       >>> sudo apt-get install --assume-yes --no-install-recommends ubuntu-desktop
+#       >>> sudo shutdown --reboot now
 #
 # =================================================================================================
+EOF
+)
 set -e # Note: we want the installer to always fail-fast (it wont affect the build system policy)
 
 
@@ -23,23 +32,13 @@ ROS_PKG='desktop-full'
 P3D_USER='student'
 PASSWORD='percep3d'
 PERCEPT_LIBRARIES_PATH="/opt/percep3d_libraries"
-
-SETUP_SSH_DAEMON=${SETUP_SSH_DAEMON:-false} # Skip ssh daemon setup if set to false
 VAGRANT_SSH_PORT=22
 
-SHOW_SPLASH_IDU="${SHOW_SPLASH_IDU:-false}"
-
-P3D_USER_HOME="/home/${P3D_USER}"
-P3D_ROS_DEV_WORKSPACE="${P3D_USER_HOME}/ros2_ws"
-
-# skip GUI dialog by setting everything to default
-export DEBIAN_FRONTEND=noninteractive
 
 # ....Project root logic...........................................................................
 TMP_CWD=$(pwd)
 P3DS_PATH=$(git rev-parse --show-toplevel)
 cd "${P3DS_PATH}" || exit 1
-
 
 # ....Helper function..............................................................................
 N2ST_PATH=${N2ST_PATH:-"${P3DS_PATH}/utilities/norlab-shell-script-tools"}
@@ -47,6 +46,57 @@ N2ST_PATH=${N2ST_PATH:-"${P3DS_PATH}/utilities/norlab-shell-script-tools"}
 cd "${N2ST_PATH}" || exit 1
 source import_norlab_shell_script_tools_lib.bash
 
+function show_help() {
+  # (NICE TO HAVE) ToDo: refactor as a n2st fct (ref NMO-583)
+  echo -e "${MSG_DIMMED_FORMAT}"
+  n2st::draw_horizontal_line_across_the_terminal_window "="
+  echo -e "$0 --help\n"
+  # Strip shell comment char `#` and both lines
+  echo -e "${DOCUMENTATION_INSTALL_PERCEP_3_D_SOFTWARE_ROS_1}" | sed 's/\# ====.*//' | sed 's/^\#//'
+  n2st::draw_horizontal_line_across_the_terminal_window "="
+  echo -e "${MSG_END_FORMAT}"
+}
+
+# ....Set env variables (pre cli)..................................................................
+declare -a REMAINING_ARGS
+INSTALL_SSH_DAEMON=false # Skip ssh daemon setup if set to false
+SHOW_SPLASH=true
+
+# ....cli..........................................................................................
+while [ $# -gt 0 ]; do
+
+  case $1 in
+    --install-ssh-daemon)
+      INSTALL_SSH_DAEMON=true
+      shift # Remove argument (--install-ssh-daemon)
+      ;;
+    --no-splash)
+      SHOW_SPLASH=false
+      shift # Remove argument (--no-splash)
+      ;;
+    -h | --help)
+      clear
+      show_help
+      exit
+      ;;
+    --) # no more option
+      shift
+      REMAINING_ARGS=( "$@" )
+      break
+      ;;
+    *) # Default case
+      REMAINING_ARGS=("$@")
+      break
+      ;;
+  esac
+
+done
+
+# ....Set env variables (post cli)...............................................................
+P3D_USER_HOME="/home/${P3D_USER}"
+P3D_ROS_DEV_WORKSPACE="${P3D_USER_HOME}/catkin_ws"
+
+export DEBIAN_FRONTEND=noninteractive
 
 # ....Setup timezone and localization..............................................................
 # change the locale from POSIX to UTF-8
@@ -57,11 +107,15 @@ apt-get update && \
       lsb-release \
   && rm -rf /var/lib/apt/lists/* \
   && locale-gen en_US en_US.UTF-8 \
-  && update-locale LC_ALL=en_US.UTF-8 LANG=en_US.UTF-8 \
-  && export LANG=en_US.UTF-8
+  && update-locale LC_ALL=en_US.UTF-8 LANG=en_US.UTF-8 LANGUAGE=en_US:en
 
-if [[ "${SHOW_SPLASH_IDU}" == 'true' ]]; then
-  n2st::norlab_splash "Percep3D course software install" "https://github.com/norlab-ulaval/percep3d_software"
+# Update the current shell
+export LC_ALL=en_US.UTF-8
+export LANG=en_US.UTF-8
+export LANGUAGE=en_US:en
+
+if [[ "${SHOW_SPLASH}" == 'true' ]]; then
+  n2st::norlab_splash "Percep3D course software install" "https://github.com/norlab-ulaval/percep3d_software" 2>/dev/null
 fi
 n2st::print_formated_script_header "install_percep3d_software_ros2.bash"
 
@@ -78,7 +132,8 @@ elif [[ ${DISTRIB_RELEASE} == '22.04' ]]; then # Ubuntu jammy
   P3D_ROS_DISTRO='humble'
 #   P3D_ROS_DISTRO='iron'
 elif [[ ${DISTRIB_RELEASE} == '24.04' ]]; then # Ubuntu noble
-  P3D_ROS_DISTRO='jazzy'
+  P3D_ROS_DISTRO='jazzy'Ulysse962
+
 else
   n2st::print_msg_error_and_exit "Ubuntu distro ${DISTRIB_RELEASE} not supported by the installer"
 fi
@@ -155,7 +210,6 @@ apt-get update \
         tree \
         bash-completion \
         net-tools \
-        python-is-python3 \
     && rm -rf /var/lib/apt/lists/*
 
 
@@ -175,7 +229,7 @@ apt-get update \
 # ===Service: ssh server===========================================================================
 n2st::print_formated_script_header "ssh daemon setup" "."
 
-if [[ ${SETUP_SSH_DAEMON} == true ]]; then
+if [[ ${INSTALL_SSH_DAEMON} == true ]]; then
   n2st::print_msg "Install and configure ssh daemon"
   VM_SSH_SERVER_PORT=2222
 
@@ -214,13 +268,14 @@ apt-get update \
         python3-opengl \
         python3-numpy \
         python3-pip \
+        python-is-python3 \
     && rm -rf /var/lib/apt/lists/* \
     && python3 -m pip install --upgrade pip
 
 n2st::print_formated_script_header "Install libpointmatcher" "."
 
 cd "${PERCEPT_LIBRARIES_PATH}"
-git clone --recurse-submodules https://github.com/ethz-asl/libpointmatcher.git
+git clone --recurse-submodules https://github.com/norlab-ulaval/libpointmatcher.git
 cd libpointmatcher
 
 if [[ ${DISTRIB_RELEASE} == '20.04' ]]; then
@@ -257,7 +312,7 @@ bash libpointmatcher_installer.bash \
       --cmake-build-type Release \
     || exit 1
 
-# (CRITICAL) ToDo: on task end >> unmute next bloc ↓↓
+
 cd "${PERCEPT_LIBRARIES_PATH}/libpointmatcher/build_system/ubuntu/"
 bash lpm_execute_libpointmatcher_unittest.bash
 

@@ -56,6 +56,8 @@ RUN sudo chmod +x install_percep3d_software_ros1.bash
 
 # Note: Switch to the run command version for multiarch testing
 RUN sudo bash install_percep3d_software_ros1.bash
+#RUN sudo bash install_percep3d_software_ros1.bash --no-splash
+#RUN sudo bash install_percep3d_software_ros1.bash --install-ssh-daemon
 #ENTRYPOINT [ "sudo", "bash", "install_percep3d_software_ros1.bash" ]
 
 CMD [ "bash" ]

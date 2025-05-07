@@ -60,7 +60,8 @@ machines, including all necessary dependencies and configurations for robotics p
 
 [//]: # ( ==== Maintainer ============================================ ) 
 <sub>
-Maintainer <a href="https://redleader962.github.io">Luc Coupal</a><br>
+Maintainer <a href="https://redleader962.github.io">Luc Coupal</a>
+&nbsp; • &nbsp;
 luc.coupal.1@ulaval.ca
 </sub>
 
@@ -125,28 +126,35 @@ One of the following ubuntu distro:
 - Ubuntu 22.04 (hammy): [ubuntu-22.04.5-live-server-arm64.iso](https://cdimage.ubuntu.com/releases/22.04/release/ubuntu-22.04.5-live-server-arm64.iso)
 ---
 
-### Script usage:
-1. Open the VM
-2. In the VM, open the _terminal_ app, copy the following lines and execute them in the VM terminal
-   - For installing the ROS1 version:  
-       ```shell
-       sudo apt-get update && sudo apt-get install --assume-yes git \
-         && cd /opt && sudo git clone --recurse-submodules https://github.com/norlab-ulaval/percep3d_software.git \
-         && cd percep3d_software/src/vm_software_install_ros1 && sudo bash install_percep3d_software_ros1.bash
-       ```
-   - For installing the ROS2 version:  
-        ```shell
-        sudo apt-get update && sudo apt-get install --assume-yes git \
-          && cd /opt && sudo git clone --recurse-submodules https://github.com/norlab-ulaval/percep3d_software.git \
-          && cd percep3d_software/src/vm_software_install_ros2 && sudo bash install_percep3d_software_ros2.bash
-        ```
+### Install script usage:
+
+1. Spin a fresh VM using your prefered virtual machine provider
+2. In the VM, open the _terminal_ app, copy the following lines and execute them in the VM terminal <br>
+   For installing the ROS1 version:  
+   ```shell
+   sudo apt-get update && sudo apt-get install --assume-yes git \
+     && cd /opt && sudo git clone --recurse-submodules https://github.com/norlab-ulaval/percep3d_software.git \
+     && cd percep3d_software/src/vm_software_install_ros1 && sudo bash install_percep3d_software_ros1.bash
+   ```
+   For installing the ROS2 version:  
+    ```shell
+    sudo apt-get update && sudo apt-get install --assume-yes git \
+      && cd /opt && sudo git clone --recurse-submodules https://github.com/norlab-ulaval/percep3d_software.git \
+      && cd percep3d_software/src/vm_software_install_ros2 && sudo bash install_percep3d_software_ros2.bash
+    ```
 3. Wait for the install script execution end. You will see console message: `Completed install_percep3d_software_ros*.bash`  
 4. Logout the current user and login with the new user `student` (password `percep3d`)
-5. (optional) If you're using a server version `.iso`, just run the following line to install a GUI
+5. (optional) If you're using a server version `.iso`, run the following line to install a GUI in the VM
     ```shell
     sudo apt-get install --assume-yes --no-install-recommends ubuntu-desktop
     sudo shutdown --reboot now
     ```
+
+#### Install scrip options:
+
+```shell
+bash install_percep3d_software_ros*.bash [--help] [--install-ssh-daemon] [--no-splash]
+```
 
 ---
 
