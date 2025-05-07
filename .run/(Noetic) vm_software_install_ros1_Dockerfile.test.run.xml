@@ -14,7 +14,7 @@
         <option name="buildCliOptions" value="--platform linux/arm64" />
         <option name="containerName" value="IamPercep3D-Noetic" />
         <option name="contextFolderPath" value="." />
-        <option name="commandLineOptions" value="-it" />
+        <option name="commandLineOptions" value="-it --rm" />
         <option name="showCommandPreview" value="true" />
         <option name="sourceFilePath" value="vm_software_install_ros1/Dockerfile.test" />
       </settings>

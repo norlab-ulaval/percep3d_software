@@ -5,6 +5,7 @@
         <option name="imageTag" value="ubuntu:20.04" />
         <option name="attachToContainerNeeded" value="true" />
         <option name="containerName" value="IamUbuntuNoeticArm64" />
+        <option name="commandLineOptions" value="--rm" />
         <option name="showCommandPreview" value="true" />
       </settings>
     </deployment>

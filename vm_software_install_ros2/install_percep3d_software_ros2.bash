@@ -9,13 +9,10 @@
 #       $ sudo apt-get update && sudo apt-get install --assume-yes git
 #       $ cd /opt
 #       $ sudo git clone --recurse-submodules https://github.com/norlab-ulaval/percep3d_software.git
-#       $ cd percep3d_software/vm_software_install_ros2 && sudo bash install_percep3d_software_ros2.bash
+#       $ cd percep3d_software/vm_software_install_ros2
+#       $ sudo bash install_percep3d_software_ros2.bash
 #   2. logout current user and login with user `student` pass `percep3d`
 #
-# Note on unit test:
-#    $ docker pull --platform linux/arm64 ubuntu:20.04
-#    $ docker build --platform linux/arm64 -f Dockerfile.test -t percep3d-vm-software-tester-ros2-ubuntu:20.04 .
-#    $ docker run -a --name iAmTestROSmelodic4vmContainer -t -i percep3d-vm-software-tester-ros2-ubuntu:20.04
 #
 # =================================================================================================
 set -e # Note: we want the installer to always fail-fast (it wont affect the build system policy)
@@ -51,11 +48,10 @@ N2ST_PATH=${N2ST_PATH:-"${P3DS_PATH}/utilities/norlab-shell-script-tools"}
 cd "${N2ST_PATH}" || exit 1
 source import_norlab_shell_script_tools_lib.bash
 
-# ====Begin========================================================================================
 
 # ....Setup timezone and localization..............................................................
 # change the locale from POSIX to UTF-8
-# ToDo: assessment >> next bloc ↓↓ as a work arround for vagrant splash console print problem
+
 apt-get update && \
   apt-get install --assume-yes --no-install-recommends \
       locales \
@@ -64,8 +60,6 @@ apt-get update && \
   && locale-gen en_US en_US.UTF-8 \
   && update-locale LC_ALL=en_US.UTF-8 LANG=en_US.UTF-8 \
   && export LANG=en_US.UTF-8
-
-#locale
 
 if [[ "${SHOW_SPLASH_IDU}" == 'true' ]]; then
   n2st::norlab_splash "Percep3D course software install" "https://github.com/norlab-ulaval/percep3d_software"

@@ -13,10 +13,6 @@
 #       $ sudo bash install_percep3d_software_ros1.bash
 #   2. Logout current user and login with user `student` pass `percep3d`
 #
-# Note on unit test:
-#    $ docker pull --platform linux/arm64 ubuntu:20.04
-#    $ docker build --platform linux/arm64 -f Dockerfile.test -t percep3d-vm-software-tester-ros1-ubuntu:20.04 .
-#    $ docker run -a --name iAmTestROSmelodic4vmContainer -t -i percep3d-vm-software-tester-ros1-ubuntu:20.04
 #
 # =================================================================================================
 set -e # Note: we want the installer to always fail-fast (it wont affect the build system policy)
@@ -77,14 +73,14 @@ n2st::print_formated_script_header "Auto set ROS distro" "."
 # Retrieve ubuntu version number: DISTRIB_RELEASE
 source /etc/lsb-release
 if [[ ${DISTRIB_RELEASE} == '18.04' ]]; then
-  ROS_DISTRO='melodic'
+  P3D_ROS_DISTRO='melodic'
 elif [[ ${DISTRIB_RELEASE} == '20.04' ]]; then
-  ROS_DISTRO='noetic'
+  P3D_ROS_DISTRO='noetic'
 else
   n2st::print_msg_error_and_exit "Ubuntu distro ${DISTRIB_RELEASE} not supported by the installer"
 fi
-P3D_ROS_ROOT="/opt/ros/${ROS_DISTRO}"
-n2st::print_msg "Ubuntu version is ${DISTRIB_RELEASE}, will install ROS1 distro ${ROS_DISTRO} at ${P3D_ROS_ROOT}"
+P3D_ROS_ROOT="/opt/ros/${P3D_ROS_DISTRO}"
+n2st::print_msg "Ubuntu version is ${DISTRIB_RELEASE}, will install ROS1 distro ${P3D_ROS_DISTRO} at ${P3D_ROS_ROOT}"
 
 
 # ====Begin========================================================================================
@@ -181,7 +177,6 @@ if [[ ${SETUP_SSH_DAEMON} == true ]]; then
   apt-get update \
       && apt-get install --assume-yes  \
           openssh-server \
-      && apt-get clean \
       && rm -rf /var/lib/apt/lists/*
 
   # This will overright the vagrant box VAGRANT_SSH_PORT
@@ -206,7 +201,7 @@ fi
 # .... Dependencies ...............................................................................
 n2st::print_formated_script_header "Install percep3D libraries and dependencies" "."
 
-if [[ ${ROS_DISTRO} == 'melodic' ]]; then
+if [[ ${P3D_ROS_DISTRO} == 'melodic' ]]; then
     apt-get update \
         && apt-get install --assume-yes \
             python-dev \
@@ -357,27 +352,27 @@ curl -s https://raw.githubusercontent.com/ros/rosdistro/master/ros.asc | apt-key
 mkdir -p "${P3D_ROS_DEV_WORKSPACE}/src/"
 cd "${P3D_ROS_DEV_WORKSPACE}/src/"
 
-if [[ ${ROS_DISTRO} == 'melodic' ]]; then
+if [[ ${P3D_ROS_DISTRO} == 'melodic' ]]; then
     apt-get update \
         && apt-get install --assume-yes \
-            ros-"${ROS_DISTRO}"-$(echo "${ROS_PKG}" | tr '_' '-') \
+            ros-"${P3D_ROS_DISTRO}"-$(echo "${ROS_PKG}" | tr '_' '-') \
             python-rosdep \
             python-rosinstall-generator \
             python-vcstool \
             python-wstool \
             python-rosinstall \
-        && rosdep init \
+        && sudo rosdep init \
         || exit 1
 else
     apt-get update \
         && apt-get install --assume-yes \
-            ros-"${ROS_DISTRO}"-$(echo "${ROS_PKG}" | tr '_' '-') \
+            ros-"${P3D_ROS_DISTRO}"-$(echo "${ROS_PKG}" | tr '_' '-') \
             python3-rosdep \
             python3-rosinstall-generator \
             python3-vcstool \
             python3-wstool \
             python3-rosinstall \
-        && rosdep init \
+        && sudo rosdep init \
         || exit 1
 fi
 
@@ -385,25 +380,24 @@ n2st::print_formated_script_header "Install ROS1: rosdep update & install" "."
 
 apt-get update --fix-missing
 apt-get install --assume-yes \
-     ros-"${ROS_DISTRO}"-common-msgs
+     ros-"${P3D_ROS_DISTRO}"-common-msgs
 
-rosdep update
+rosdep update --rosdistro="${P3D_ROS_DISTRO}"
 rosdep fix-permissions
 
 cd "${P3D_ROS_DEV_WORKSPACE}"
 apt-get update \
-    && rosdep install --from-paths ./src \
+    && rosdep install \
+      --from-paths ./src \
       --ignore-packages-from-source \
-      --rosdistro"=${ROS_DISTRO}" \
-      --include-eol-distros \
-      -q \
+      --rosdistro="${P3D_ROS_DISTRO}" \
       -y \
     || exit 1
 
 n2st::print_formated_script_header "Install ROS1: setup catkin workspace" "."
 
 source "${P3D_ROS_ROOT}/setup.bash"
-catkin_make
+catkin_make || exit 1
 source "${P3D_ROS_DEV_WORKSPACE}/devel/setup.bash"
 
 echo "source ${P3D_ROS_ROOT}/setup.bash" >> "${HOME}/.bashrc"
@@ -426,9 +420,10 @@ echo "sourcing ${P3D_ROS_ROOT}/setup.bash" \
   && echo PYTHONPATH="${PYTHONPATH:?'Build argument needs to be set and non-empty.'}" \
   && echo CMAKE_PREFIX_PATH="${CMAKE_PREFIX_PATH:?'Build argument needs to be set and non-empty.'}" \
   && echo "" \
-  && python -c "import rospy" \
+  && python3 -c "import rospy" \
   && [[ "$(rosversion --distro)" == "${P3D_ROS_DISTRO}" ]] \
   || exit 1
+
 
 echo "Check workspace directory installation"  \
     && [[ -d ${P3D_ROS_DEV_WORKSPACE}/src ]] \
@@ -463,7 +458,7 @@ source "${P3D_ROS_DEV_WORKSPACE}/devel/setup.bash"
 export CMAKE_PREFIX_PATH="${PERCEPT_LIBRARIES_PATH:?err}:${CMAKE_PREFIX_PATH}"
 
 apt-get update --fix-missing
-catkin_make
+catkin_make || exit 1
 
 # . . Install required dependencies for tutorial. . . . . . . . . . . . . . . . . . . . . . . . .
 # Required dependencies for tutorial: Introduction to tf https://wiki.ros.org/tf/Tutorials/Introduction%20to%20tf

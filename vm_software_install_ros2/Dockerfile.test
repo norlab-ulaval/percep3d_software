@@ -4,6 +4,11 @@ FROM ${BASE_IMAGE} AS base-image
 LABEL org.opencontainers.image.authors="luc.coupal.1@ulaval.ca"
 ARG DEBIAN_FRONTEND=noninteractive
 
+ENV TZ=Etc/UTC
+ENV TERM=${TERM:-"xterm-256color"}
+
+ARG DOCKER_USER=docker
+
 SHELL ["/bin/bash", "-c"]
 
 # install development utilities
@@ -28,15 +33,29 @@ RUN apt-get update \
 
 WORKDIR "/"
 
-#RUN useradd -m docker && echo "docker:docker" | chpasswd && adduser docker sudo
-#USER docker
+RUN <<EOF
+    #!/bin/bash
+
+    useradd -s /bin/bash --create-home  "${DOCKER_USER}"
+    yes "percep3d" | sudo passwd "${DOCKER_USER}"
+    # Add DOCKER_USER to sudo group
+    usermod -a -G sudo "${DOCKER_USER}"
+
+    echo "${DOCKER_USER} ALL=(root) NOPASSWD:ALL" >/etc/sudoers.d/"${DOCKER_USER}"
+    chmod 0440 "/etc/sudoers.d/${DOCKER_USER}"
+EOF
+
+USER "${DOCKER_USER}"
 
 COPY vm_software_install_ros2 "/vm_software_install_ros2"
 COPY utilities "/utilities"
 COPY .git "/.git"
 
-
 WORKDIR vm_software_install_ros2
-RUN chmod +x install_percep3d_software_ros2.bash
-RUN bash install_percep3d_software_ros2.bash
-CMD ["bash"]
+RUN sudo chmod +x install_percep3d_software_ros2.bash
+
+# Note: Switch to the run command version for multiarch testing
+RUN sudo bash install_percep3d_software_ros2.bash
+#ENTRYPOINT [ "sudo", "bash", "install_percep3d_software_ros2.bash" ]
+
+CMD [ "echo", "-e", "✅  Testing install_percep3d_software_ros2.bash completed with SUCCESS" ]
