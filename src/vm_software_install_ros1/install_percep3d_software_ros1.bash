@@ -105,6 +105,7 @@ apt-get update && \
   apt-get install --assume-yes --no-install-recommends \
       locales \
       lsb-release \
+      tree \
   && rm -rf /var/lib/apt/lists/* \
   && locale-gen en_US en_US.UTF-8 \
   && update-locale LC_ALL=en_US.UTF-8 LANG=en_US.UTF-8 LANGUAGE=en_US:en
@@ -200,7 +201,6 @@ apt-get update \
         git \
         usbutils \
         vim \
-        tree \
         bash-completion \
         net-tools \
     && rm -rf /var/lib/apt/lists/*

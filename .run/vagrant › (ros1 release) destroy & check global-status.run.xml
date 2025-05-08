@@ -1,11 +1,11 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="vagrant › (ros1) snapshot save --force ros1-vm-clean-slate" type="ShConfigurationType" folderName="[P3SC] B | vagrant ros1">
-    <option name="SCRIPT_TEXT" value="vagrant snapshot save --force ros1-vm-clean-slate" />
+  <configuration default="false" name="vagrant › (ros1 release) destroy &amp; check global-status" type="ShConfigurationType" folderName="[P3SC] B | vagrant ros1 release">
+    <option name="SCRIPT_TEXT" value="sudo vagrant destroy --graceful --force &amp;&amp; vagrant global-status --prune" />
     <option name="INDEPENDENT_SCRIPT_PATH" value="true" />
     <option name="SCRIPT_PATH" value="" />
     <option name="SCRIPT_OPTIONS" value="" />
     <option name="INDEPENDENT_SCRIPT_WORKING_DIRECTORY" value="true" />
-    <option name="SCRIPT_WORKING_DIRECTORY" value="$PROJECT_DIR$/src/vm_software_install_ros1" />
+    <option name="SCRIPT_WORKING_DIRECTORY" value="$PROJECT_DIR$/src/vm_software_install_ros1_release/" />
     <option name="INDEPENDENT_INTERPRETER_PATH" value="true" />
     <option name="INTERPRETER_PATH" value="/bin/zsh" />
     <option name="INTERPRETER_OPTIONS" value="" />

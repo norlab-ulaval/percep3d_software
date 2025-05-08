@@ -122,7 +122,7 @@ docker build \
 docker run --name IamPercep3D-Humble --init --rm -it perce3d-software-ros2:humble-full-ubuntu-22.04 
 ```
 
-### arm64 specific (e.g. Apple M1 chips)
+### arm64 specific (e.g. Apple M chips)
 
 #### ROS1 vm
 ```shell

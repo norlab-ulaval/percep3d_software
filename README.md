@@ -78,26 +78,42 @@ luc.coupal.1@ulaval.ca
 
 **Table of content**
 <!-- TOC -->
-* [Percep3D course software install](#percep3d-course-software-install-)
+* [_Perception 3D course software install_](#_perception-3d-course-software-install_)
   * [Percep3D course software install, for Virtual Machine (VM)](#percep3d-course-software-install-for-virtual-machine-vm)
+  * [Pre-built VM](#pre-built-vm)
+    * [Parallel-Desktop VM](#parallel-desktop-vm-)
+  * [Instruction for building your own VM](#instruction-for-building-your-own-vm)
     * [VM requirement for ROS1](#vm-requirement-for-ros1)
     * [VM requirement for ROS2](#vm-requirement-for-ros2)
     * [VM provider](#vm-provider)
     * [Ubuntu install images](#ubuntu-install-images)
-      * [Install image for x86 processor](#install-image-for-x86-processor)
-      * [Install image for arm64 processor](#install-image-for-arm64-processor)
-    * [Script usage:](#script-usage)
+      * [Install image for x86 processor:](#install-image-for-x86-processor)
+      * [Install image for arm64 processor:](#install-image-for-arm64-processor)
+    * [Install script usage:](#install-script-usage)
+      * [Install scrip options:](#install-scrip-options)
     * [Software installs step:](#software-installs-step)
-      * [`install_percep3d_software_ros1.bash` ](#the-script-install_percep3d_software_ros1bash-will-execute-the-following-steps)
-      * [`install_percep3d_software_ros2.bash` ](#the-script-install_percep3d_software_ros2bash-will-execute-the-following-steps)
+      * [The script `install_percep3d_software_ros1.bash` will execute the following steps:](#the-script-install_percep3d_software_ros1bash-will-execute-the-following-steps)
+      * [The script `install_percep3d_software_ros2.bash` will execute the following steps:](#the-script-install_percep3d_software_ros2bash-will-execute-the-following-steps)
   * [Note:](#note-)
     * [To connect remotely to the VM (require the optional ssh server install step)](#to-connect-remotely-to-the-vm-require-the-optional-ssh-server-install-step)
-* [Instruction for maintainer](README.dev.md#development-resources)
+* [Instruction for maintainer](README.dev.md#instruction-for-maintainer)
 <!-- TOC -->
 
 ---
 
 ## Percep3D course software install, for Virtual Machine (VM)
+
+## Pre-built VM
+Download image and open in your VM provider.
+Those VMs come with all the software and course ressources pre-installed. It's the same as spining your own VM, cloning this repository and then executing `install_percep3d_software_ros1.bash`.
+
+### Parallel-Desktop VM 
+
+- (For Apple M chips) [percep3d-vm-ros1-vagrant-release-pro.pvmp](https://ulavaldti.sharepoint.com/:u:/s/Percep3D-Organisation/EbeGmYmwgulCsV_gwYa-sPYB2zVoP3poRR17gugzIXvFoQ?e=jCj6hC)
+- (For Apple M chips) [percep3d-vm-ros1-manual-release.pvmp](https://ulavaldti.sharepoint.com/:u:/s/Percep3D-Organisation/EWofhCPdtFxLuSMPagEa1E0Br8T1bVzY9VxEBY6kyP2rxw?e=QaXrBW)
+
+
+## Instruction for building your own VM
 
 ### VM requirement for ROS1
 One of the following ubuntu distro:

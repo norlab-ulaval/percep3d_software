@@ -51,14 +51,22 @@ Vagrant.configure("2") do |config|
   #  - https://download.parallels.com/desktop/v16/docs/en_US/Parallels%20Desktop%20Pro%20Edition%20Command-Line%20Reference.pdf
   #
   config.vm.provider "parallels" do |prl|
-    # Setup Parallels Tools Auto-Update
-    prl.update_guest_tools = true
-
-    # Customize the amount of memory on the VM:
+    prl.name = "percep3d-vm-ros1-development"
     prl.memory = 16048
     prl.cpus = 8
 
+    # Setup Parallels Tools Auto-Update
+    prl.update_guest_tools = true
+
+    # VM portability
     prl.linked_clone = true # (CRITICAL) ToDo: Switch to false for release (!)
+
+    prl.customize "post-import", ["set", :id,
+        "--startup-view", "headless",
+        "--description", "Perception 3D robotics perception course VM, ROS1 version, DEV"
+        ]
+    # GUI cutomizations: --startup-view [window, fullscreen, headless, same] --3d-accelerate highest --high-resolution on
+    # Optimization cutomizations: --faster-vm on --resource-quota unlimited
   end
 
   # ====Multimachine config================
@@ -83,7 +91,7 @@ Vagrant.configure("2") do |config|
   end
 
   # ====Provisioning========================
-  $INLINE_SCRIP = <<-'SCRIPT'
+  $INLINE_SCRIPT = <<-'SCRIPT'
 
   export DEBIAN_FRONTEND=noninteractive
   apt-get update
@@ -108,16 +116,16 @@ Vagrant.configure("2") do |config|
       net-tools \
       dnsutils
 
-  echo "Set dev default landing path"
+  echo -e "\nSet DEV default landing path\n"
   echo "cd /opt/percep3d_software/src/vm_software_install_ros1" >> /home/vagrant/.bashrc
 
-  # Install The Ubuntu Desktop Gui
-  apt-get install --assume-yes --no-install-recommends ubuntu-desktop
+  # echo -e "\nInstall The Ubuntu Desktop Gui\n"
+  # apt-get install --assume-yes --no-install-recommends ubuntu-desktop
 
   SCRIPT
 
   config.vm.provision :shell do |shell|
-    shell.inline = $INLINE_SCRIP
+    shell.inline = $INLINE_SCRIPT
     shell.privileged = true
     shell.reboot = true
   end
