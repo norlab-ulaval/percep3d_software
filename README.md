@@ -66,7 +66,7 @@ Maintainer <a href="https://redleader962.github.io">Luc Coupal</a>
 
 **Table of content**
 <!-- TOC -->
-* [Percep3D course software install](#percep3d-course-software-install-)
+* [_Perception 3D course software install_](#_perception-3d-course-software-install_)
   * [Percep3D course software install, for Virtual Machine (VM)](#percep3d-course-software-install-for-virtual-machine-vm)
   * [Pre-built VM](#pre-built-vm)
     * [Parallel-Desktop VM](#parallel-desktop-vm-)
@@ -84,7 +84,7 @@ Maintainer <a href="https://redleader962.github.io">Luc Coupal</a>
       * [The script `install_percep3d_software_ros2.bash` will execute the following steps:](#the-script-install_percep3d_software_ros2bash-will-execute-the-following-steps)
   * [Note:](#note-)
     * [To connect remotely to the VM (require the optional ssh server install step)](#to-connect-remotely-to-the-vm-require-the-optional-ssh-server-install-step)
-* [Instruction for maintainer](README.maintainer.md#development-resources)
+* [Instruction for maintainer](README.maintainer.md#instruction-for-maintainer)
 <!-- TOC -->
 
 ---
