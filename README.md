@@ -63,35 +63,37 @@ Maintainer <a href="https://redleader962.github.io">Luc Coupal</a>
 
 [//]: # ( ==== Body ================================================== ) 
 
+<details>
+  <summary style="font-weight: bolder;font-size: medium;">Table of content</summary>
 
-**Table of content**
 <!-- TOC -->
 * [_Perception 3D course software install_](#_perception-3d-course-software-install_)
-  * [Percep3D course software install, for Virtual Machine (VM)](#percep3d-course-software-install-for-virtual-machine-vm)
-  * [Pre-built VM](#pre-built-vm)
+  * [Pre-built Virtual Machine (VM)](#pre-built-virtual-machine-vm)
     * [Parallel-Desktop VM](#parallel-desktop-vm-)
-  * [Instruction for building your own VM](#instruction-for-building-your-own-vm)
-    * [VM requirement for ROS1](#vm-requirement-for-ros1)
-    * [VM requirement for ROS2](#vm-requirement-for-ros2)
+    * [VirtualBox VM](#virtualbox-vm)
+  * [Instruction for building your own Virtual Machine (VM)](#instruction-for-building-your-own-virtual-machine-vm)
     * [VM provider](#vm-provider)
-    * [Ubuntu install images](#ubuntu-install-images)
+    * [VM requirement](#vm-requirement)
+      * [For running ROS1](#for-running-ros1-)
+      * [For running ROS2](#for-running-ros2-)
+    * [Ubuntu base images for creating a new VM](#ubuntu-base-images-for-creating-a-new-vm)
       * [Install image for x86 processor:](#install-image-for-x86-processor)
       * [Install image for arm64 processor:](#install-image-for-arm64-processor)
-    * [Install script usage:](#install-script-usage)
-      * [Install scrip options:](#install-scrip-options)
-    * [Software installs step:](#software-installs-step)
+    * [Installation procedure:](#installation-procedure)
+      * [Note on install script options:](#note-on-install-script-options)
+    * [Software installer script installs steps:](#software-installer-script-installs-steps)
       * [The script `install_percep3d_software_ros1.bash` will execute the following steps:](#the-script-install_percep3d_software_ros1bash-will-execute-the-following-steps)
       * [The script `install_percep3d_software_ros2.bash` will execute the following steps:](#the-script-install_percep3d_software_ros2bash-will-execute-the-following-steps)
   * [Note:](#note-)
     * [To connect remotely to the VM (require the optional ssh server install step)](#to-connect-remotely-to-the-vm-require-the-optional-ssh-server-install-step)
-* [Instruction for maintainer](README.maintainer.md#instruction-for-maintainer)
 <!-- TOC -->
+* [_Instruction for maintainer_](README.maintainer.md#instruction-for-maintainer)
 
----
+</details>  
 
-## Percep3D course software install, for Virtual Machine (VM)
 
-## Pre-built VM
+
+## Pre-built Virtual Machine (VM)
 Download image and open in your VM provider.
 Those VMs come with all the software and course ressources pre-installed. It's the same as spining your own VM, cloning this repository and then executing `install_percep3d_software_ros1.bash`.
 
@@ -100,37 +102,44 @@ Those VMs come with all the software and course ressources pre-installed. It's t
 - (For Apple M chips) [percep3d-vm-ros1-vagrant-release-pro.pvmp](https://ulavaldti.sharepoint.com/:u:/s/Percep3D-Organisation/EbeGmYmwgulCsV_gwYa-sPYB2zVoP3poRR17gugzIXvFoQ?e=jCj6hC)
 - (For Apple M chips) [percep3d-vm-ros1-manual-release.pvmp](https://ulavaldti.sharepoint.com/:u:/s/Percep3D-Organisation/EWofhCPdtFxLuSMPagEa1E0Br8T1bVzY9VxEBY6kyP2rxw?e=QaXrBW)
 
+### VirtualBox VM
+- See course website
 
-## Instruction for building your own VM
-
-### VM requirement for ROS1
-One of the following ubuntu distro:
-- Ubuntu 20.04 (_focal_) for working with ROS1 version _Noetic_
-- Ubuntu 18.04 (_bionic_) for working with ROS1 version _Melodic_
-
-### VM requirement for ROS2
-One of the following ubuntu distro:
-- Ubuntu 24.04 (_noble_) for working with ROS2 version _Jazzy_
-- Ubuntu 22.04 (_jammy_) for working with ROS2 version _Humble_
-- Ubuntu 20.04 (_focal_) for working with ROS2 version _Foxy_
+## Instruction for building your own Virtual Machine (VM)
 
 ### VM provider
 - [Parallels Desktop](https://www.parallels.com/products/desktop/) (Recommended for Mac user. There's a 30 day trial version)
 - VirtualBox
 - VMware
 
-### Ubuntu install images
+### VM requirement
+Each ROS version is link to Ubuntu distribution. Chose one of the following ubuntu distro:
+
+#### For running ROS1 
+- Ubuntu 20.04 (_focal_) for working with ROS1 version _Noetic_
+- Ubuntu 18.04 (_bionic_) for working with ROS1 version _Melodic_
+
+#### For running ROS2 
+- Ubuntu 24.04 (_noble_) for working with ROS2 version _Jazzy_
+- Ubuntu 22.04 (_jammy_) for working with ROS2 version _Humble_
+- Ubuntu 20.04 (_focal_) for working with ROS2 version _Foxy_
+
+
+### Ubuntu base images for creating a new VM
+Create a new VM using the menu option "_from an image file_"
+
 #### Install image for x86 processor:
 - Ubuntu 20.04 (Focal): [ubuntu-20.04.6-desktop-amd64.iso](https://releases.ubuntu.com/focal/ubuntu-20.04.6-desktop-amd64.iso)
 - Ubuntu 22.04 (Focal): [ubuntu-22.04.5-desktop-amd64.iso](https://releases.ubuntu.com/jammy/ubuntu-22.04.5-desktop-amd64.iso)
 
 #### Install image for arm64 processor:
-**Note(arm64 version)**: execute `sudo apt-get install -y ubuntu-desktop && sudo shutdown --reboot now` on vm first spin. 
+
 - Ubuntu 20.04 (Focal): [ubuntu-20.04.5-live-server-arm64.iso](https://cdimage.ubuntu.com/releases/20.04/release/ubuntu-20.04.5-live-server-arm64.iso) 
 - Ubuntu 22.04 (hammy): [ubuntu-22.04.5-live-server-arm64.iso](https://cdimage.ubuntu.com/releases/22.04/release/ubuntu-22.04.5-live-server-arm64.iso)
+
 ---
 
-### Install script usage:
+### Installation procedure:
 
 1. Spin a fresh VM using your prefered virtual machine provider
 2. In the VM, open the _terminal_ app, copy the following lines and execute them in the VM terminal <br>
@@ -148,21 +157,26 @@ One of the following ubuntu distro:
     ```
 3. Wait for the install script execution end. You will see console message: `Completed install_percep3d_software_ros*.bash`  
 4. Logout the current user and login with the new user `student` (password `percep3d`)
-5. (optional) If you're using a server version `.iso`, run the following line to install a GUI in the VM
+5. (For server version `.iso`) Run the following line to install a GUI in the VM
     ```shell
-    sudo apt-get install --assume-yes --no-install-recommends ubuntu-desktop
-    sudo shutdown --reboot now
+    sudo apt-get install -y ubuntu-desktop && sudo shutdown --reboot now
     ```
 
-#### Install scrip options:
-
+#### Note on install script options:
 ```shell
-bash install_percep3d_software_ros*.bash [--help] [--install-ssh-daemon] [--no-splash]
+# Usage:
+#   $ bash install_percep3d_software_ros1.bash [--help] [--install-ssh-daemon] [--no-splash]
+#
+# Arguments:
+#   --install-ssh-daemon    Configure and start an ssh daemon on the vm for remote developement
+#   --no-splash             Skip the script splash screen (for developer)
+#   -h | --help             Script usage with install instruction step reminder
 ```
+
 
 ---
 
-### Software installs step:
+### Software installer script installs steps:
 
 #### The script `install_percep3d_software_ros1.bash` will execute the following steps:
 - Install ROS1 version: _melodic_ or _noetic_

@@ -8,8 +8,8 @@ DOCUMENTATION_INSTALL_PERCEP_3_D_SOFTWARE_ROS_1=$( cat <<'EOF'
 #
 # Arguments:
 #   --install-ssh-daemon    Configure and start an ssh daemon on the vm for remote developement
-#   --no-splash             Skip the script splash screen
-#   -h | --help
+#   --no-splash             Skip the script splash screen (for developer)
+#   -h | --help             Script usage with install instruction step reminder
 #
 # Note on VM script install steps:
 #   1. Spin a fresh VM using your prefered virtual machine provider
