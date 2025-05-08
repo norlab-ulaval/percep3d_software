@@ -27,7 +27,6 @@
     &nbsp;
 </sup>
 <br>
-<br>
 
 [//]: # ( ==== Description =========================================== )
 **Software installation scripts and instructions for the Perception 3D robotics perception course**
@@ -38,13 +37,10 @@ software environment for the Percep3D course. It supports both ROS1 and ROS2 ins
 machines, including all necessary dependencies and configurations for robotics perception exercises.
 
 
-<br>
-
 [//]: # ( ==== Badges ================================================ ) 
 
 [![semantic-release: conventional commits](https://img.shields.io/badge/semantic--release-conventional_commits-453032?logo=semantic-release)](https://github.com/semantic-release/semantic-release)
 <img alt="GitHub release (with filter)" src="https://img.shields.io/github/v/release/norlab-ulaval/percep3d_software">
-
 
 [//]: # (NorLab teamcity)
 [//]: # (TODO: Un-comment the next line if your repository has run configuration enable on the norlab-teamcity-server)
@@ -56,13 +52,9 @@ machines, including all necessary dependencies and configurations for robotics p
 [//]: # (<a href="https://hub.docker.com/repository/docker/norlabulaval/libpointmatcher/"> <img alt="Docker Image Version &#40;latest semver&#41;" src="https://img.shields.io/docker/v/norlabulaval/libpointmatcher?logo=docker"> </a>)
 
 
-<br>
-
 [//]: # ( ==== Maintainer ============================================ ) 
 <sub>
 Maintainer <a href="https://redleader962.github.io">Luc Coupal</a>
-&nbsp; • &nbsp;
-luc.coupal.1@ulaval.ca
 </sub>
 
 <br>
@@ -72,13 +64,9 @@ luc.coupal.1@ulaval.ca
 [//]: # ( ==== Body ================================================== ) 
 
 
-
----
-
-
 **Table of content**
 <!-- TOC -->
-* [_Perception 3D course software install_](#_perception-3d-course-software-install_)
+* [Percep3D course software install](#percep3d-course-software-install-)
   * [Percep3D course software install, for Virtual Machine (VM)](#percep3d-course-software-install-for-virtual-machine-vm)
   * [Pre-built VM](#pre-built-vm)
     * [Parallel-Desktop VM](#parallel-desktop-vm-)
@@ -96,7 +84,7 @@ luc.coupal.1@ulaval.ca
       * [The script `install_percep3d_software_ros2.bash` will execute the following steps:](#the-script-install_percep3d_software_ros2bash-will-execute-the-following-steps)
   * [Note:](#note-)
     * [To connect remotely to the VM (require the optional ssh server install step)](#to-connect-remotely-to-the-vm-require-the-optional-ssh-server-install-step)
-* [Instruction for maintainer](README.dev.md#instruction-for-maintainer)
+* [Instruction for maintainer](README.maintainer.md#development-resources)
 <!-- TOC -->
 
 ---
