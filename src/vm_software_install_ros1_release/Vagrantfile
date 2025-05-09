@@ -65,7 +65,7 @@ Vagrant.configure("2") do |config|
     prl.customize "post-import", ["set", :id,
         "--startup-view", "window",
         "--3d-accelerate", "highest",
-        "--high-resolution", "on",
+#         "--high-resolution", "on",
         "--faster-vm", "on",
         "--resource-quota", "unlimited",
         "--description", "Perception 3D robotics perception course VM, ROS1 version, Vagrant release"
@@ -74,25 +74,10 @@ Vagrant.configure("2") do |config|
     # Optimization cutomizations: --faster-vm on --resource-quota unlimited
   end
 
-  # ====Multimachine config================
-  # Note:
-  # - VM port mapping:
-  #     - port 80 (mapped to host 8080) is for docker internet access, e.g. executin apt-get update inside docker container
-  #     - port 2222 is for accessing the VM ssh server for Remote Developement setup
 
   config.vm.define "percep3d-vm-ros1-release", primary: true do |tcserver|
     tcserver.vm.box = UBUNTU_BOX
     tcserver.vm.hostname = "percep3d"
-    tcserver.vm.network "private_network", ip: "132.203.26.126"
-    config.vm.network "forwarded_port", guest: 80, host: 8080
-    config.vm.network "forwarded_port", guest: 2222, host: 2222
-    # # tcserver.vm.network "forwarded_port", guest: 8111, host: 8111, guest_ip: "132.203.26.126"
-    #
-    tcserver.vm.provision "Check network", type: "shell", run: "always", inline: <<-SHELL
-        echo
-        echo "I am '$(whoami)', my address is $(ifconfig eth1 | grep inet | awk '$1==\"inet\" {print $2}')"
-        echo
-    SHELL
   end
 
   # ====Provisioning========================

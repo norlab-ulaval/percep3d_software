@@ -99,8 +99,9 @@ Those VMs come with all the software and course ressources pre-installed. It's t
 
 ### Parallel-Desktop VM 
 
-- (For Apple M chips) [percep3d-vm-ros1-vagrant-release-pro.pvmp](https://ulavaldti.sharepoint.com/:u:/s/Percep3D-Organisation/EbeGmYmwgulCsV_gwYa-sPYB2zVoP3poRR17gugzIXvFoQ?e=jCj6hC)
-- (For Apple M chips) [percep3d-vm-ros1-manual-release.pvmp](https://ulavaldti.sharepoint.com/:u:/s/Percep3D-Organisation/EWofhCPdtFxLuSMPagEa1E0Br8T1bVzY9VxEBY6kyP2rxw?e=QaXrBW)
+#### For Apple M chips
+- [percep3d-vm-ros1-manual-release.pvmp](https://ulavaldti.sharepoint.com/:u:/s/Percep3D-Organisation/EWofhCPdtFxLuSMPagEa1E0Br8T1bVzY9VxEBY6kyP2rxw?e=QaXrBW)
+- [percep3d-vm-ros1-vagrant-release.pvmp](https://ulavaldti.sharepoint.com/:u:/s/Percep3D-Organisation/ERJb-6UeBvhIv1K_xwIJTWUB0tCwWdH_caxzF3LLBxM_1w?e=mLgwyF)
 
 ### VirtualBox VM
 - See course website
