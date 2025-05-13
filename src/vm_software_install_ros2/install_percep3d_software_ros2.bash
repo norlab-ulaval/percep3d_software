@@ -278,6 +278,7 @@ cd "${PERCEPT_LIBRARIES_PATH}"
 git clone --recurse-submodules https://github.com/norlab-ulaval/libpointmatcher.git
 cd libpointmatcher
 
+# ToDo: update once LPM task NMO-606 is fixed
 if [[ ${DISTRIB_RELEASE} == '20.04' ]]; then
   # Quick-hack to get the proper get-pip.py version for noetic
   FILE_TO_CHANGE="${PERCEPT_LIBRARIES_PATH}/libpointmatcher/build_system/ubuntu/lpm_install_dependencies_general_ubuntu.bash"
