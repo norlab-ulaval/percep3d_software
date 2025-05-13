@@ -109,7 +109,7 @@ Those VMs come with all the software and course ressources pre-installed. It's t
 ## Instruction for building your own Virtual Machine (VM)
 
 ### VM provider
-- [Parallels Desktop](https://www.parallels.com/products/desktop/) (Recommended for Mac user. There's a 30 day trial version)
+- [Parallels Desktop](https://www.parallels.com/products/desktop/) (Recommended for Mac user. There's a 15 days trial version)
 - VirtualBox
 - VMware
 
