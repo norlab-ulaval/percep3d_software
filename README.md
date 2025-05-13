@@ -97,19 +97,33 @@ Maintainer <a href="https://redleader962.github.io">Luc Coupal</a>
 Download image and open in your VM provider.
 Those VMs come with all the software and course ressources pre-installed. It's the same as spining your own VM, cloning this repository and then executing `install_percep3d_software_ros1.bash`.
 
-### Parallel-Desktop VM 
+### [UTM](https://mac.getutm.app/) Virtual Machine (free and open source)
+#### For Apple Silicone (M chips)
+1. Install [UTM Virtual machine](https://mac.getutm.app/)
+2. Download the [image of the virtual machine](https://ulavaldti.sharepoint.com/:u:/s/Percep3D-Organisation/EfNJurOEecZFqW74p0vO0C0BGRg0zK3a7PLrMg3t4VVg2Q?e=InwRkf)
+3. Unzip `Percep3d-vm-ros1-manual-realease.utm.zip`. You should end up with a file with the extension `.utm`.
+4. Open UTM. Then, `File -> Open...`.
+5. Navigate to the place where you extracted the file `Percep3d-vm-ros1-manual-realease.utm`.
+6. Click on the Play arrow, and you should be good to go.
 
-#### For Apple M chips
-- [percep3d-vm-ros1-manual-release.pvmp](https://ulavaldti.sharepoint.com/:u:/s/Percep3D-Organisation/EWofhCPdtFxLuSMPagEa1E0Br8T1bVzY9VxEBY6kyP2rxw?e=QaXrBW)
-- [percep3d-vm-ros1-vagrant-release.pvmp](https://ulavaldti.sharepoint.com/:u:/s/Percep3D-Organisation/ERJb-6UeBvhIv1K_xwIJTWUB0tCwWdH_caxzF3LLBxM_1w?e=mLgwyF)
+### [Parallels Desktop](https://www.parallels.com/products/desktop/) Virtual Machine 
 
-### VirtualBox VM
+#### For Apple Silicone (M chips)
+
+1. Install [Parallels Desktop](https://www.parallels.com/products/desktop/)
+2. Download the image of the virtual machine [percep3d-vm-ros1-manual-release.pvmp](https://ulavaldti.sharepoint.com/:u:/s/Percep3D-Organisation/EWofhCPdtFxLuSMPagEa1E0Br8T1bVzY9VxEBY6kyP2rxw?e=QaXrBW)
+3. Move the `.pvmp` file to your VM folder
+4. Double-click on the image file, and you should be good to go.
+
+
+### VirtualBox Virtual Machine
 - See course website
 
 ## Instruction for building your own Virtual Machine (VM)
 
 ### VM provider
-- [Parallels Desktop](https://www.parallels.com/products/desktop/) (Recommended for Mac user. There's a 15 days trial version)
+- [Parallels Desktop](https://www.parallels.com/products/desktop/) (macOs only. Recommended for Mac user. There's a 15 days trial version)
+- [UTM Virtual machine](https://mac.getutm.app/) (macOs only) 
 - VirtualBox
 - VMware
 

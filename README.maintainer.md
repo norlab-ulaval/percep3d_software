@@ -25,6 +25,7 @@ The `Vagrantfile` at repository root is custom-made with the following configura
 1. Install [Vagrant](https://www.vagrantup.com). Run `vagrant --help` to check available command. 
 2. Install a provider. Dont forget to modify the `Vagrantfile` accordingly to your choosen provider.
    - [parallels desktop + Vagrant](http://parallels.github.io/vagrant-parallels/docs/) on Mac OsX 
+   - [UTM](https://mac.getutm.app/) + [Vagrant-UTM](https://naveenrajm7.github.io/vagrant_utm/) on Mac OsX
    - [VirtualBox](https://developer.hashicorp.com/vagrant/docs/providers/virtualbox)
    - [VMware](https://developer.hashicorp.com/vagrant/docs/providers/vmware)
    - [Docker](https://developer.hashicorp.com/vagrant/docs/providers/docker)
