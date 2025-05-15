@@ -115,9 +115,11 @@ Those VMs come with all the software and course ressources pre-installed. It's t
 3. Move the `.pvmp` file to your VM folder
 4. Double-click on the image file, and you should be good to go.
 
-
-### VirtualBox Virtual Machine
-- See course website
+### VirtualBox and VMware Virtual Machine
+#### For Window's or Linux operating system (x86/amd64 architecture)
+1. Download the [image of the virtual machine](http://norlab.s3.valeria.science/percep3d/percep3d_ubuntu.zip?AWSAccessKeyId=XMBLP3A0338XN5LASKV2&Expires=2287756789&Signature=gqpWNF9uNsBC7tGlpn41QveftkA%3D)
+2. Unzip `percep3d_ubuntu.zip`. You should end up with a file with the extension `.ova`.
+3. Open `percep3d_ubuntu.ova` in either VirtualBox or VMware
 
 ## Instruction for building your own Virtual Machine (VM)
 
